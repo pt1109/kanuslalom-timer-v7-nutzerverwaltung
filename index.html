@@ -1,0 +1,260 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123b5d"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><title>Kanuslalom Timer</title><style>
+:root{font-family:system-ui,Arial,sans-serif;color:#183047;background:#f2f5f8}*{box-sizing:border-box}body{margin:0}header{background:#123b5d;color:white;padding:18px 16px}header h1{font-size:22px;margin:0}.header-content{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:800px;margin:auto}.header-logo{width:58px;height:58px;object-fit:contain;flex-shrink:0}header small{opacity:.8}main{max-width:800px;margin:auto;padding:12px}nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:14px}button{font:inherit;cursor:pointer;border:0;border-radius:9px;padding:10px;background:#e7edf3;color:#183047}button:disabled{opacity:.45}nav button{font-size:12px;padding:12px 3px}nav .active{background:#123b5d;color:white}.card{background:white;border:1px solid #dce3e9;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 7px #142c4210}.top,.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.delete-athlete{background:transparent;color:#607384;padding:6px 9px;font-size:23px;line-height:1;border-radius:8px;flex-shrink:0}.delete-athlete:hover{background:#e7edf3}.top input{min-width:0;flex:1;font-size:17px;font-weight:650;border:1px solid #dde3e9;border-radius:8px;padding:8px}.time{font-size:38px;font-weight:750;text-align:center;font-variant-numeric:tabular-nums;margin:12px 0}.actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.actions .start{grid-column:1/-1;background:#15803d;color:white;font-weight:700;font-size:18px}.actions .stop{background:#b91c1c}.save{background:#125a92;color:white}.danger-reset{background:#b91c1c;color:white;width:100%;margin-top:12px;font-weight:700}.danger-reset:hover{background:#991b1b}.muted{color:#607384;font-size:13px}.summary{margin:10px 0}.expand{width:100%;text-align:left;display:flex;justify-content:space-between;margin-top:8px}.gate-scroll{max-height:250px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.gate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.gate-card{border:1px solid #dce3e9;border-radius:10px;padding:8px}.gate-card .row{margin-bottom:7px}.gate-name{display:inline-flex;align-items:center;justify-content:center;background:#15803d;color:white;font-weight:700;border-radius:6px;min-width:42px;min-height:36px}.up{background:#b91c1c!important}.gate-actions{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gate-actions button{padding:9px 2px}.chosen{background:#125a92;color:white}.add{width:100%;border:1px dashed #8398a8;background:white}.setup-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.setup-item{min-width:0}.setup-item button{width:100%;height:52px;background:#15803d;color:white;font-size:17px;font-weight:700}.setup-item input{width:100%;text-align:center;padding:7px 1px;margin-top:3px;border:1px solid #ccd6df;border-radius:7px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:8px 3px;border-bottom:1px solid #e3e9ef}th:last-child,td:last-child{text-align:right}h2{font-size:18px;margin:4px 0 14px}h3{margin:0 0 10px;font-size:16px}.small-btn{padding:6px 10px}.file{display:block;margin:10px 0}.hidden{display:none}.pdf-report{display:none}@media print{@page{size:A4;margin:15mm}header,main,#rooms{display:none!important}.pdf-report{display:block!important;color:#172a3b;font-family:Arial,sans-serif;font-size:10pt}.pdf-report h1{font-size:20pt;margin:0 0 8mm}.pdf-report h2{font-size:14pt;margin:8mm 0 3mm}.pdf-report h3{font-size:12pt;margin:6mm 0 2mm}.pdf-report table{width:100%;font-size:9pt;border-collapse:collapse}.pdf-report th{background:#e7edf3}.pdf-report th,.pdf-report td{border-bottom:1px solid #ccd6df;padding:6px;text-align:left}.pdf-report th:last-child,.pdf-report td:last-child{text-align:right}.pdf-report section{break-inside:avoid}.pdf-report .subnote{font-size:9pt;color:#4a6071}}.note{font-size:12px;color:#657787;margin:12px 2px} @media(max-width:360px){.time{font-size:32px}.gate-grid{gap:5px}.gate-card{padding:5px}}
+
+/* Sanfte horizontale Seitenuebergaenge */
+#content{position:relative;will-change:transform;touch-action:pan-y;}
+#app-main{overflow-x:clip;}
+.slide-ghost{position:fixed;z-index:12;pointer-events:none;overflow:hidden;will-change:transform;box-sizing:border-box;}
+@media(prefers-reduced-motion:reduce){#content,.slide-ghost{transition:none!important}}
+</style><style>
+#rooms{max-width:800px;margin:12px auto;padding:0 12px}#room-panel{background:#fff;border:1px solid #dce3e9;border-radius:14px;padding:16px;box-shadow:0 2px 7px #142c4210}#room-panel h2{margin:0 0 12px}.room-input{width:100%;font:inherit;padding:11px;border:1px solid #cbd5e1;border-radius:9px;margin:5px 0 12px}.room-btn{background:#125a92;color:white;margin:5px 5px 5px 0}.room-btn.secondary{background:#e7edf3;color:#183047}.room-status{font-size:13px;color:#526b7d}.room-code{font-size:24px;font-weight:750;letter-spacing:3px}.offline{color:#b91c1c!important}
+ 
+/* Trainingseinheit-Seitenmenü */
+.header-content{justify-content:initial}.header-content .header-logo{margin-left:auto}
+.menu-toggle{flex-shrink:0;background:transparent;color:white;border:1px solid #ffffff66;font-size:23px;line-height:1;width:43px;height:43px;padding:5px}
+.menu-toggle:hover{background:#ffffff22}
+#room-overlay{position:fixed;inset:0;background:#071c2c88;z-index:90;display:none}
+#room-overlay.open{display:block}
+#rooms{position:fixed!important;top:0;bottom:0;left:0;z-index:100;width:min(340px,88vw);max-width:none!important;margin:0!important;padding:0!important;background:#fff;box-shadow:5px 0 22px #0003;transform:translateX(-110%);transition:transform .22s ease;overflow-y:auto;visibility:hidden}
+#rooms.open{transform:translateX(0);visibility:visible}
+#room-panel{border:0!important;box-shadow:none!important;border-radius:0!important;padding:18px!important}
+.room-menu-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.room-menu-top h2{margin:0!important}
+.menu-close{background:#e7edf3;color:#183047;font-size:23px;padding:4px 11px}
+body.menu-open{overflow:hidden}
+@media print{#room-overlay,#rooms,.menu-toggle{display:none!important}}
+#mode-home{max-width:700px;margin:26px auto;padding:0 16px}#mode-home h2{text-align:center;margin:20px 0 6px}#mode-home .intro{text-align:center;color:#5c6b79;margin-bottom:25px}.mode-card{background:#fff;border:1px solid #d7e0e8;border-radius:14px;padding:20px;margin:16px 0;box-shadow:0 2px 9px #0012}.mode-card h3{margin:0 0 5px}.mode-card p{color:#596878;line-height:1.5}.mode-card button{width:100%;margin-top:10px;padding:13px}.mode-subtitle{font-size:13px;color:#667789}.room-menu-top .menu-close{cursor:pointer}#mode-back{margin:12px 0}.offline-note{color:#566a7b}#room-panel .home-link{margin-top:16px;width:100%}#app-main .note{display:none}@media print{#mode-home{display:none!important}}
+
+<style>
+.account-box{margin-top:20px;padding-top:14px;border-top:1px solid #dce3e9}.account-box h3{margin:0 0 10px}.account-box label{display:block;font-size:13px;margin:9px 0 3px}.account-box input{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}.account-box button{margin:9px 5px 3px 0}.account-info{font-size:13px;color:#54687b;overflow-wrap:anywhere}.account-error{color:#a42323;font-size:13px;white-space:pre-wrap}.account-box [hidden]{display:none!important}
+</style></head><body><header><div class="header-content"><button class="menu-toggle" id="menu-open" aria-label="Trainingseinheit-Menü öffnen" aria-controls="rooms" aria-expanded="false">☰</button><div><h1>Kanuslalom Timer</h1><small>Trainingszeitmessung</small></div><img class="header-logo" src="logo-header.png" alt="AKV Logo"></div></header><section id="mode-home"><h2>Training starten</h2><p class="intro">Wähle aus, wie du die Zeitmessung verwenden möchtest.</p><div class="mode-card"><h3>Einzelgerät</h3><div class="mode-subtitle">Offline-Modus</div><p>Zeitmessung auf einem Gerät, ohne Internetverbindung und ohne Trainingseinheit. Die Daten werden lokal gespeichert.</p><button id="start-offline">Einzelgerät starten</button></div><div class="mode-card"><h3>Gemeinsames Training</h3><div class="mode-subtitle">Online-Modus</div><p>Zeitmessung mit mehreren Trainern auf unterschiedlichen Geräten. Alle Zeiten und Ergebnisse werden automatisch synchronisiert.</p><button id="start-online">Gemeinsames Training starten</button></div></section><div id="room-overlay"></div><section id="rooms" aria-label="Trainingseinheit-Menü"><div id="room-panel"><div class="room-menu-top"><h2 id="room-menu-heading">Trainingseinheit</h2><button class="menu-close" id="menu-close" aria-label="Menü schließen">×</button></div><p class="room-status" id="firebase-status">Verbindung wird hergestellt …</p><div id="room-controls"></div><button class="room-btn secondary home-link" id="back-home">Zum Hauptmenü</button><div class="account-box" id="account-box"><h3>Benutzerkonto</h3><div id="account-view"></div></div></div></section><main id="app-main" style="display:none"><nav id="nav"></nav><div id="content"></div><p class="note">Die Daten dieser Trainingseinheit werden über Firebase synchronisiert. Für die Zeitmessung ist eine stabile Internetverbindung erforderlich. PDF-Export über Drucken.</p></main><div id="pdf-report" class="pdf-report"></div><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script><script>
+function setRoomMenu(open){
+  document.getElementById('rooms').classList.toggle('open',open);
+  document.getElementById('room-overlay').classList.toggle('open',open);
+  document.body.classList.toggle('menu-open',open);
+  document.getElementById('menu-open').setAttribute('aria-expanded',String(open));
+}
+document.getElementById('menu-open').addEventListener('click',()=>setRoomMenu(!document.getElementById('rooms').classList.contains('open')));
+document.getElementById('menu-close').addEventListener('click',()=>setRoomMenu(false));
+document.getElementById('room-overlay').addEventListener('click',()=>setRoomMenu(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setRoomMenu(false)});
+const KEY='kanuslalom-timer-offline-v1';let mode='home';const makeGates=()=>Array.from({length:25},(_,i)=>({id:i+1,num:String(i+1).padStart(2,'0'),up:false}));const newAthlete=(id,name)=>({id,name,elapsed:0,start:null,running:false,penalties:{},runs:[],expanded:false});const defaults=()=>({gates:makeGates(),gateCount:18,athletes:[newAthlete(1,'Sportler 1'),newAthlete(2,'Sportler 2')]});const normalizePenalties=p=>{
+  // Firebase Realtime Database may return numeric-keyed objects as arrays.
+  // Example: {"1":2} is returned as [null,2]. Preserve those penalties.
+  if(!p||typeof p!=='object')return {};
+  return Object.fromEntries(Object.entries(p).filter(([key,val])=>val!==null&&val!==undefined&&val!==0&&Number.isFinite(Number(val))));
+};
+const normalizeRun=r=>({...r,elapsed:Number(r?.elapsed)||0,penalty:Number(r?.penalty)||0,total:Number(r?.total) || ((Number(r?.elapsed)||0)+(Number(r?.penalty)||0)*1000),penalties:normalizePenalties(r?.penalties),gateLabels:r?.gateLabels&&typeof r.gateLabels==='object'?r.gateLabels:{}});const normalizeAthlete=a=>({...a,elapsed:Number(a.elapsed)||0,start:a.start??null,running:!!a.running,penalties:normalizePenalties(a.penalties),runs:Array.isArray(a.runs)?a.runs.filter(Boolean).map(normalizeRun):[],expanded:false});const normalizeData=d=>({...defaults(),...(d||{}),gates:Array.isArray(d?.gates)?d.gates:makeGates(),athletes:Array.isArray(d?.athletes)?d.athletes.map(normalizeAthlete):[]});let data=defaults();let tab='timing';const localExpanded=new Set();const isExpanded=a=>localExpanded.has(String(a.id));const $=id=>document.getElementById(id);const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const fmt=ms=>{let n=Math.floor(Math.max(0,ms)/10);return `${String(Math.floor(n/6000)).padStart(2,'0')}:${String(Math.floor(n/100)%60).padStart(2,'0')}.${String(n%100).padStart(2,'0')}`};const elapsed=a=>a.elapsed+(a.running?Math.max(0,Date.now()+(mode==='online'?serverOffset:0)-a.start):0);const pen=a=>Object.values(a.penalties).reduce((s,v)=>s+Number(v),0);const saveState=()=>{if(mode==='offline')try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){console.warn('Lokales Speichern fehlgeschlagen',e)}};const persistChanges=before=>{if(mode==='offline')saveState();else syncDelta(before,data)};const athlete=id=>data.athletes.find(a=>a.id===id);const gateCard=(a,g)=>{let p=a.penalties[g.id]||0;return `<div class="gate-card"><div class="row"><span class="gate-name ${g.up?'up':''}">${escapeHTML(g.num)}</span><small>+${p} s</small></div><div class="gate-actions"><button class="${p===2?'chosen':''}" data-action="pen" data-id="${a.id}" data-gate="${g.id}" data-val="2">+2</button><button class="${p===50?'chosen':''}" data-action="pen" data-id="${a.id}" data-gate="${g.id}" data-val="50">+50</button></div></div>`};
+function render(target=$('content')){
+ const scrollPositions=new Map();if(tab==='timing')document.querySelectorAll('.gate-scroll[data-athlete]').forEach(el=>scrollPositions.set(el.dataset.athlete,el.scrollTop));
+ $('nav').innerHTML=[['timing','Zeitmessung'],['gates','Tore'],['ranking','Rangliste'],['results','Ergebnisse']].map(([id,name])=>`<button class="${tab===id?'active':''}" data-tab="${id}">${name}</button>`).join('');let html='';if(tab==='timing'){html=data.athletes.map(a=>`<section class="card"><div class="top"><input aria-label="Sportlername" data-name="${a.id}" value="${escapeHTML(a.name)}"><small>Lauf ${a.runs.length+1}</small><button class="delete-athlete" data-action="delete" data-id="${a.id}" aria-label="${escapeHTML(a.name)} entfernen" title="Sportler entfernen">×</button></div><div class="time" id="clock-${a.id}">${fmt(elapsed(a))}</div><div class="actions"><button class="start ${a.running?'stop':''}" data-action="toggle" data-id="${a.id}">${a.running?'■ Stopp':'▶ Start'}</button><button class="save" data-action="save" data-id="${a.id}" ${a.running||a.elapsed===0?'disabled':''}>Speichern & Reset</button><button data-action="reset" data-id="${a.id}">Reset</button></div><div class="row summary"><small id="pen-${a.id}">Strafzeit: +${pen(a)} s</small><strong id="total-${a.id}">Gesamt: ${fmt(elapsed(a)+pen(a)*1000)}</strong></div><button class="expand" data-action="expand" data-id="${a.id}">Torfehler ${isExpanded(a)?'ausblenden':'anzeigen'} <span>${Object.keys(a.penalties).length} Fehler</span></button>${isExpanded(a)?`<div class="gate-scroll" data-athlete="${a.id}"><div class="gate-grid">${data.gates.slice(0,data.gateCount).map(g=>gateCard(a,g)).join('')}</div></div>`:''}</section>`).join('')+`<button class="add" data-action="add">+ Sportler hinzufügen</button>`}else if(tab==='gates'){html=`<section class="card"><h2>Streckenkonfiguration</h2><div class="row"><span>Anzahl der Tore</span><div><button data-action="count" data-delta="-1">−</button> <strong>${data.gateCount}</strong> <button data-action="count" data-delta="1">+</button></div></div><p class="muted">Tor antippen: grün = Abwärtstor, rot = Aufwärtstor. Nummern darunter bearbeiten (00–99).</p><div class="setup-grid">${data.gates.slice(0,data.gateCount).map(g=>`<div class="setup-item"><button class="${g.up?'up':''}" data-action="color" data-gate="${g.id}">${escapeHTML(g.num)}</button><input aria-label="Tornummer" inputmode="numeric" maxlength="2" data-gatenum="${g.id}" value="${escapeHTML(g.num)}"></div>`).join('')}</div><p><button data-action="resetgates">Tore zurücksetzen</button></p></section>`}else if(tab==='ranking'){let ranked=data.athletes.filter(a=>a.runs.length).map(a=>({a,best:a.runs.reduce((x,y)=>y.total<x.total?y:x)})).sort((x,y)=>x.best.total-y.best.total);html=`<section class="card"><h2>Rangliste – bester Lauf</h2>${ranked.length?`<table><tr><th>Pl.</th><th>Sportler</th><th>Lauf</th><th>Strafe</th><th>Gesamt</th></tr>${ranked.map(({a,best},i)=>`<tr><td>${i+1}</td><td>${escapeHTML(a.name)}</td><td>${best.number}</td><td>+${best.penalty}s</td><td>${fmt(best.total)}</td></tr>`).join('')}</table>`:'Noch keine gespeicherten Läufe.'}</section>`}else{html=`<h2>Gespeicherte Ergebnisse</h2>`+data.athletes.map(a=>`<section class="card"><h3>${escapeHTML(a.name)} · ${a.runs.length} Läufe</h3>${a.runs.length?`<table><tr><th>Lauf</th><th>Fahrzeit</th><th>Strafe</th><th>Gesamt</th></tr>${a.runs.map(r=>`<tr><td>${r.number}</td><td>${fmt(r.elapsed)}</td><td>+${r.penalty}s</td><td>${fmt(r.total)}</td></tr>`).join('')}</table>${a.runs.filter(r=>Object.keys(r.penalties||{}).length).map(r=>`<p class="muted">Lauf ${r.number}: ${Object.entries(r.penalties||{}).map(([id,p])=>`Tor ${escapeHTML(r.gateLabels?.[id]||id)} (+${p}s)`).join(', ')}</p>`).join('')}`:'Noch keine Ergebnisse gespeichert.'}</section>`).join('')+`<section class="card"><h3>PDF-Bericht</h3><p class="muted">Rangliste und alle gespeicherten Läufe der Sportler als PDF ausgeben.</p><button class="save" data-action="pdf">📄 Ergebnisse exportieren</button><button class="danger-reset" data-action="resetall">${mode==='offline'?'Einzelgerät zurücksetzen':'Trainingseinheit zurücksetzen'}</button></section>`} target.innerHTML=html;if(target===$('content')&&tab==='timing')document.querySelectorAll('.gate-scroll[data-athlete]').forEach(el=>{if(scrollPositions.has(el.dataset.athlete))el.scrollTop=scrollPositions.get(el.dataset.athlete)})}
+
+function exportPDF(){
+ const ranked=data.athletes.filter(a=>a.runs.length).map(a=>({a,best:a.runs.reduce((x,y)=>y.total<x.total?y:x)})).sort((x,y)=>x.best.total-y.best.total);
+ const table=(headers,rows)=>`<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+ const rankingTable=ranked.length?table(['Platz','Sportler','Lauf','Fahrzeit','Strafe','Gesamtzeit'],ranked.map(({a,best},i)=>[i+1,escapeHTML(a.name),best.number,fmt(best.elapsed),`+${best.penalty} s`,fmt(best.total)])):'Noch keine gespeicherten Läufe.';
+ const results=data.athletes.map(a=>`<section><h3>${escapeHTML(a.name)}</h3>${a.runs.length?table(['Lauf','Fahrzeit','Strafe','Gesamtzeit'],a.runs.map(r=>[r.number,fmt(r.elapsed),`+${r.penalty} s`,fmt(r.total)]))+a.runs.filter(r=>Object.keys(r.penalties||{}).length).map(r=>`<p class="subnote">Lauf ${r.number}: ${Object.entries(r.penalties||{}).map(([id,p])=>`Tor ${escapeHTML(r.gateLabels?.[id]||data.gates.find(g=>g.id===Number(id))?.num||id)} (+${Number(p)} s)`).join(', ')}</p>`).join(''):'Noch keine gespeicherten Läufe.'}</section>`).join('');
+ $('pdf-report').innerHTML=`<h1>Kanuslalom – Trainingsergebnisse</h1><p>Erstellt am ${new Date().toLocaleString('de-DE')}</p><h2>Rangliste – bester Lauf pro Sportler</h2>${rankingTable}<h2>Einzelergebnisse</h2>${results}`;
+ window.print();
+}
+
+function download(name,content,type){let url=URL.createObjectURL(new Blob([content],{type}));let a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+// Navigation bleibt lokal; die Daten werden beim Wechsel nicht geaendert.
+const TAB_ORDER=['timing','gates','ranking','results'];
+let swipeStart=null,slideBusy=false;
+const swipeArea=document.getElementById('content');
+let slideTimer=null;
+function clearSlide(){
+ if(slideTimer){clearTimeout(slideTimer);slideTimer=null;}
+ document.querySelectorAll('.slide-ghost').forEach(el=>el.remove());
+ swipeArea.style.transition='';swipeArea.style.transform='';
+ slideBusy=false;
+}
+function slideSnapshot(){
+ const rect=swipeArea.getBoundingClientRect();
+ const ghost=document.createElement('div');ghost.className='slide-ghost';
+ Object.assign(ghost.style,{left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',minHeight:rect.height+'px'});
+ const snapshot=swipeArea.cloneNode(true);snapshot.removeAttribute('id');
+ snapshot.style.transform='none';snapshot.style.transition='none';
+ ghost.appendChild(snapshot);document.body.appendChild(ghost);
+ return {ghost,width:rect.width};
+}
+function animateSlide(ghost,width,direction,complete=true,onDone=()=>{}){
+ slideBusy=true;
+ const duration=260,easing='cubic-bezier(.22,.75,.24,1)';
+ ghost.style.transition=`transform ${duration}ms ${easing}`;
+ swipeArea.style.transition=`transform ${duration}ms ${easing}`;
+ requestAnimationFrame(()=>{
+  ghost.style.transform=`translate3d(${complete?direction*width:0}px,0,0)`;
+  swipeArea.style.transform=`translate3d(${complete?0:-direction*width}px,0,0)`;
+ });
+ slideTimer=setTimeout(()=>{onDone();clearSlide();},duration+55);
+}
+function changeTab(next){
+ if(slideBusy||swipeStart||next===tab||!TAB_ORDER.includes(next))return;
+ const direction=TAB_ORDER.indexOf(next)>TAB_ORDER.indexOf(tab)?-1:1;
+ const {ghost,width}=slideSnapshot();
+ tab=next;render();
+ ghost.style.transform='translate3d(0,0,0)';
+ swipeArea.style.transition='none';
+ swipeArea.style.transform=`translate3d(${-direction*width}px,0,0)`;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>animateSlide(ghost,width,direction)));
+ window.scrollTo({top:0,behavior:'instant'});
+}
+function startInteractiveSlide(dx){
+ const direction=dx>0?1:-1;
+ const next=TAB_ORDER[TAB_ORDER.indexOf(tab)+(direction===1?-1:1)];
+ if(!next)return false;
+ const rect=swipeArea.getBoundingClientRect();
+ const ghost=document.createElement('div');ghost.className='slide-ghost';
+ Object.assign(ghost.style,{left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',minHeight:rect.height+'px'});
+ const incoming=document.createElement('div');
+ incoming.style.width='100%';
+ ghost.appendChild(incoming);
+ // Build the incoming page offscreen without replacing the original touch target.
+ const previous=tab;tab=next;render(incoming);tab=previous;
+ document.body.appendChild(ghost);
+ swipeStart.ghost=ghost;swipeStart.width=rect.width;swipeStart.direction=direction;
+ swipeStart.nextTab=next;
+ ghost.style.transition='none';swipeArea.style.transition='none';
+ ghost.style.transform=`translate3d(${-direction*rect.width}px,0,0)`;
+ return true;
+}
+function positionInteractiveSlide(dx){
+ const s=swipeStart;
+ const drag=Math.max(-s.width,Math.min(s.width,dx));
+ s.drag=drag;
+ swipeArea.style.transform=`translate3d(${drag}px,0,0)`;
+ s.ghost.style.transform=`translate3d(${drag-s.direction*s.width}px,0,0)`;
+}
+document.addEventListener('touchstart',e=>{
+ if(!e.target.closest('#content'))return;
+ if(slideBusy||e.touches.length!==1||mode==='home'||document.getElementById('rooms').classList.contains('open')){swipeStart=null;return;}
+ if(e.target.closest('input,textarea,select,button,a,[contenteditable="true"],.gate-scroll')){swipeStart=null;return;}
+ const t=e.touches[0];swipeStart={x:t.clientX,y:t.clientY,time:Date.now(),horizontal:false,drag:0};
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+ if(!swipeStart||e.touches.length!==1)return;
+ const t=e.touches[0],dx=t.clientX-swipeStart.x,dy=t.clientY-swipeStart.y;
+ if(!swipeStart.horizontal){
+  if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){swipeStart=null;return;}
+  if(Math.abs(dx)<12||Math.abs(dx)<Math.abs(dy)*1.4)return;
+  swipeStart.horizontal=true;
+  if(!startInteractiveSlide(dx)){swipeStart=null;return;}
+ }
+ positionInteractiveSlide(dx);
+ if(e.cancelable)e.preventDefault();
+},{passive:false});
+function finishSwipe(cancelled=false){
+ if(!swipeStart)return;
+ const s=swipeStart;swipeStart=null;
+ if(!s.ghost)return;
+ const complete=!cancelled&&Math.abs(s.drag)>=Math.min(65,s.width*.22);
+ const duration=260,easing='cubic-bezier(.22,.75,.24,1)';
+ slideBusy=true;
+ s.ghost.style.transition=`transform ${duration}ms ${easing}`;
+ swipeArea.style.transition=`transform ${duration}ms ${easing}`;
+ requestAnimationFrame(()=>{
+  swipeArea.style.transform=`translate3d(${complete?s.direction*s.width:0}px,0,0)`;
+  s.ghost.style.transform=`translate3d(${complete?0:-s.direction*s.width}px,0,0)`;
+ });
+ slideTimer=setTimeout(()=>{
+  if(complete){tab=s.nextTab;render();window.scrollTo({top:0,behavior:'instant'});}
+  clearSlide();
+ },duration+55);
+}
+document.addEventListener('touchcancel',()=>finishSwipe(true),{passive:true});
+document.addEventListener('touchend',()=>finishSwipe(false),{passive:true});
+document.addEventListener('click',e=>{let b=e.target.closest('[data-tab],[data-action]');if(!b)return;if(b.dataset.tab){changeTab(b.dataset.tab);return}let action=b.dataset.action,id=Number(b.dataset.id),a=athlete(id),g=Number(b.dataset.gate);if(mode==='offline'){/* Local changes are allowed without a network connection. */}else if(!roomRef || !connected){alert('Keine Datenbankverbindung. Bitte Internetverbindung prüfen.');return}const before=structuredClone(data);if(action==='toggle'){if(a.running){a.elapsed=elapsed(a);a.start=null;a.running=false}else{a.start=Date.now()+(mode==='online'?serverOffset:0);a.running=true}}else if(action==='save'){if(a.running||a.elapsed<=0)return;let p=pen(a);a.runs.push({number:a.runs.length+1,elapsed:a.elapsed,penalties:{...a.penalties},gateLabels:Object.fromEntries(data.gates.map(g=>[g.id,g.num])),penalty:p,total:a.elapsed+p*1000});a.elapsed=0;a.start=null;a.running=false;a.penalties={}}else if(action==='reset'){if(!confirm(`Aktuellen Lauf von ${a.name} ohne Speichern verwerfen?`))return;a.elapsed=0;a.start=null;a.running=false;a.penalties={}}else if(action==='expand'){const key=String(a.id);if(localExpanded.has(key))localExpanded.delete(key);else localExpanded.add(key);render();return}else if(action==='pen'){const selected=Number(b.dataset.val);if(Number(a.penalties[g]||0)===selected)delete a.penalties[g];else a.penalties[g]=selected;persistChanges(before);const scroll=b.closest('.gate-scroll');if(scroll){const card=b.closest('.gate-card');const p=a.penalties[g]||0;card.querySelector('small').textContent='+'+p+' s';card.querySelectorAll('[data-action=pen]').forEach(btn=>btn.classList.toggle('chosen',Number(btn.dataset.val)===p&&p!==0))}const summary=$('pen-'+a.id),total=$('total-'+a.id),expand=b.closest('.card').querySelector('.expand span');if(summary)summary.textContent='Strafzeit: +'+pen(a)+' s';if(total)total.textContent='Gesamt: '+fmt(elapsed(a)+pen(a)*1000);if(expand)expand.textContent=Object.keys(a.penalties).length+' Fehler';return}else if(action==='delete'){if(!confirm(`Sportler ${a.name} wirklich löschen? Auch alle ${a.runs.length} gespeicherten Läufe werden dauerhaft aus der Rangliste und den Ergebnissen entfernt.`))return;data.athletes=data.athletes.filter(x=>x.id!==id)}else if(action==='add'){let id=Math.max(0,...data.athletes.map(a=>a.id))+1;data.athletes.push(newAthlete(id,`Sportler ${data.athletes.length+1}`))}else if(action==='count'){data.gateCount=Math.max(1,Math.min(25,data.gateCount+Number(b.dataset.delta)))}else if(action==='color'){let gate=data.gates.find(x=>x.id===g);gate.up=!gate.up}else if(action==='resetgates'){data.gates.forEach((g,i)=>{g.up=false;g.num=String(i+1).padStart(2,'0')})}else if(action==='pdf'){exportPDF();return}else if(action==='resetall'){if(!confirm('ACHTUNG: Alle Sportler, Laufzeiten, Torfehler und die Streckenkonfiguration werden unwiderruflich gelöscht. '+(mode==='offline'?'Einzelgerät':'Trainingseinheit')+' wirklich zurücksetzen?'))return;if(!confirm('Letzte Bestätigung: Alle gespeicherten Ergebnisse dauerhaft löschen?'))return;data=defaults();tab='timing';persistChanges(before);render();return}persistChanges(before);render()});
+document.addEventListener('change',async e=>{let el=e.target;if(el.dataset.name){{const before=structuredClone(data);athlete(Number(el.dataset.name)).name=el.value;syncDelta(before,data)}}else if(el.dataset.gatenum){let v=el.value.replace(/\D/g,'').slice(0,2).padStart(2,'0');{const before=structuredClone(data);data.gates.find(g=>g.id===Number(el.dataset.gatenum)).num=v;persistChanges(before);render()}}});
+setInterval(()=>{if(tab==='timing'){for(const a of data.athletes){let c=$('clock-'+a.id),t=$('total-'+a.id);if(c)c.textContent=fmt(elapsed(a));if(t)t.textContent='Gesamt: '+fmt(elapsed(a)+pen(a)*1000)}}},50);if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+let serverOffset=0,connected=false,roomRef=null,unsubscribeRoom=null,unsubscribeConn=null,authReady=false,currentCode=null;
+const dbConfig={"apiKey": "AIzaSyCuMmAhuAmAumnn5Iiaq9_5r1Z2rwp_OtQ", "authDomain": "kanuslalom-timer.firebaseapp.com", "databaseURL": "https://kanuslalom-timer-default-rtdb.europe-west1.firebasedatabase.app", "projectId": "kanuslalom-timer", "storageBucket": "kanuslalom-timer.firebasestorage.app", "messagingSenderId": "281316697744", "appId": "1:281316697744:web:6e976d7e0eb40c2d275a15"};
+let fbdb;
+function statusMsg(message,error=false){const el=document.getElementById('firebase-status');el.textContent=message;el.classList.toggle('offline',error)}
+function roomUI(){const el=document.getElementById('room-controls');document.getElementById('room-menu-heading').textContent=mode==='offline'?'Einzelgerät':'Trainingseinheit';document.getElementById('firebase-status').style.display=mode==='offline'?'none':'';if(mode==='offline'){el.innerHTML='<p class="offline-note">Offline-Modus. Alle Zeiten und Ergebnisse werden auf diesem Gerät gespeichert. Keine Trainingseinheit erforderlich.</p>';return}if(mode==='home'){el.innerHTML='';return}if(!authReady){el.innerHTML='<p>Firebase-Anmeldung wird vorbereitet …</p>';return}
+if(currentCode){el.innerHTML=`<p>Raumcode: <span class="room-code">${currentCode}</span> <button class="room-btn secondary" id="copy-code">Kopieren</button></p><button class="room-btn secondary" id="leave-room">Raum verlassen</button><p class="room-status">Alle Trainer haben dieselben Rechte. Ein Reset betrifft nur diesen Raum.</p>`;document.getElementById('copy-code').onclick=()=>navigator.clipboard.writeText(currentCode).catch(()=>prompt('Raumcode kopieren:',currentCode));document.getElementById('leave-room').onclick=()=>leaveRoom();return}
+el.innerHTML='<label for="room-name">Name der neuen Trainingseinheit (optional)</label><input class="room-input" id="room-name" maxlength="60" placeholder="z. B. Eiskanal Samstag"><button class="room-btn" id="create-room">+ Trainingseinheit erstellen</button><hr><label for="join-code">Bestehender Trainingseinheit beitreten</label><input class="room-input" id="join-code" inputmode="numeric" maxlength="6" placeholder="Sechsstelliger Zugangscode"><button class="room-btn secondary" id="join-room">Raum beitreten</button>';
+document.getElementById('create-room').onclick=createRoom;document.getElementById('join-room').onclick=()=>joinRoom(document.getElementById('join-code').value.trim());}
+async function createRoom(){if(!connected){alert('Keine Verbindung zur Datenbank.');return}const name=document.getElementById('room-name').value.trim().slice(0,60);statusMsg('Trainingseinheit wird erstellt …');for(let i=0;i<8;i++){const a=new Uint32Array(1);crypto.getRandomValues(a);const code=String(100000+a[0]%900000);const ref=fbdb.ref('rooms/'+code);try{const result=await ref.transaction(old=>old===null?{name:name||'Training',createdAt:firebase.database.ServerValue.TIMESTAMP,data:defaults()}:undefined,undefined,false);if(result.committed){openRoom(code);return}}catch(e){statusMsg('Erstellen fehlgeschlagen: '+e.message,true);return}}statusMsg('Keinen freien Raumcode gefunden. Bitte erneut versuchen.',true)}
+async function joinRoom(code){if(!/^\d{6}$/.test(code)){alert('Bitte einen sechsstelligen Code eingeben.');return}statusMsg('Trainingseinheit wird gesucht …');try{const snap=await fbdb.ref('rooms/'+code).once('value');if(!snap.exists()){statusMsg('Trainingseinheit nicht gefunden.',true);return}openRoom(code)}catch(e){statusMsg('Beitritt fehlgeschlagen: '+e.message,true)}}
+function openRoom(code){localExpanded.clear();mode='online';showMode();setRoomMenu(false);syncQueue=[];syncBusy=false;deferredSnapshot=null;if(unsubscribeRoom)unsubscribeRoom();currentCode=code;localStorage.setItem('kanuslalom-room-code',code);roomRef=fbdb.ref('rooms/'+code+'/data');document.getElementById('app-main').style.display='block';roomUI();unsubscribeRoom=roomRef.on('value',snap=>{if(!snap.exists()){statusMsg('Dieser Trainingseinheit wurde gelöscht.',true);leaveRoom();return}if(syncBusy || syncQueue.length){return}data=normalizeData(snap.val());render() },e=>statusMsg('Lesen fehlgeschlagen: '+e.message,true));statusMsg('Trainingseinheit '+code+' verbunden')}
+function leaveRoom(){localExpanded.clear();setRoomMenu(false);syncQueue=[];syncBusy=false;deferredSnapshot=null;if(unsubscribeRoom&&roomRef)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;localStorage.removeItem('kanuslalom-room-code');document.getElementById('app-main').style.display='none';data=defaults();roomUI();statusMsg(connected?'Bereit – Raum erstellen oder beitreten':'Offline',!connected);if(mode==='online')setRoomMenu(true)}
+// Apply only changed fields in a transaction, preserving concurrent edits on other athletes/gates.
+let syncQueue=[],syncBusy=false,deferredSnapshot=null;
+function syncDelta(before,after){if(!roomRef)return;const changes=[];if(before.gateCount!==after.gateCount)changes.push(['gateCount',after.gateCount]);for(let i=0;i<25;i++){const b=before.gates[i],a=after.gates[i];if(JSON.stringify(b)!==JSON.stringify(a))changes.push(['gate',i,a])}
+const bm=new Map(before.athletes.map(a=>[String(a.id),a]));const am=new Map(after.athletes.map(a=>[String(a.id),a]));for(const [id,b] of bm){if(!am.has(id))changes.push(['remove',id]);}
+for(const [id,a] of am){const b=bm.get(id);if(!b){changes.push(['add',id,a]);continue}for(const k of ['name','elapsed','start','running','penalties','runs']){if(JSON.stringify(b[k])!==JSON.stringify(a[k])){if(k==='penalties'){const keys=new Set([...Object.keys(b.penalties||{}),...Object.keys(a.penalties||{})]);for(const key of keys){if(b.penalties?.[key]!==a.penalties?.[key])changes.push(['pen',id,key,a.penalties?.[key]??null])}}else if(k==='runs'){if(a.runs.length>b.runs.length)changes.push(['run',id,a.runs.slice(b.runs.length)]);else changes.push(['field',id,k,a[k]])}else changes.push(['field',id,k,a[k]])}}}
+function applyQueuedChanges(changes){return roomRef.transaction(remote=>{if(!remote)return;remote=normalizeData(structuredClone(remote));for(const c of changes){const [type,id,key,value]=c;if(type==='gateCount')remote.gateCount=id;else if(type==='gate')remote.gates[id]=key;else if(type==='remove')remote.athletes=remote.athletes.filter(a=>String(a.id)!==id);else if(type==='add'){if(!remote.athletes.some(a=>String(a.id)===id)){let fresh=normalizeAthlete(structuredClone(key));if(remote.athletes.some(a=>a.id===fresh.id))fresh.id=Math.max(0,...remote.athletes.map(a=>Number(a.id)))+1;remote.athletes.push(fresh)}}else{const a=remote.athletes.find(a=>String(a.id)===id);if(!a)continue;if(type==='field')a[key]=key==='runs'?(Array.isArray(value)?value:[]):value;else if(type==='pen'){a.penalties=a.penalties||{};if(value===null)delete a.penalties[key];else a.penalties[key]=value}else if(type==='run'){a.runs=a.runs||[];for(const r of key){const rr={...r,number:a.runs.length+1};a.runs.push(rr)}}}}return remote},undefined,false);}
+function drainSyncQueue(){
+  if(syncBusy||!syncQueue.length||!roomRef)return;
+  syncBusy=true;
+  const activeRef=roomRef;
+  const batch=syncQueue.shift();
+  applyQueuedChanges(batch).then(result=>{
+    if(activeRef!==roomRef)return;
+    if(!result.committed){
+      statusMsg('Änderung konnte nicht gespeichert werden (Konflikt).',true);
+      return;
+    }
+    // Firebase fires optimistic local value events during transactions.
+    // Only use the committed transaction snapshot, never a deferred
+    // intermediate event that can contain an earlier penalty state.
+    if(syncQueue.length===0){
+      data=normalizeData(result.snapshot.val());
+      render();
+    }
+  }).catch(e=>{
+    if(activeRef===roomRef)statusMsg('Speichern fehlgeschlagen: '+e.message,true);
+  }).finally(()=>{
+    if(activeRef!==roomRef)return;
+    deferredSnapshot=null;
+    syncBusy=false;
+    if(syncQueue.length)drainSyncQueue();
+  });
+}
+if(changes.length){syncQueue.push(changes);drainSyncQueue()} }
+function showMode(){document.getElementById('mode-home').style.display=mode==='home'?'':'none';document.getElementById('app-main').style.display=mode==='offline'||(mode==='online'&&!!currentCode)?'block':'none';document.getElementById('menu-open').style.visibility=mode==='home'?'hidden':'visible';roomUI();if(mode==='offline'||(mode==='online'&&currentCode))render()}
+function enterOffline(){localExpanded.clear();if(roomRef){if(unsubscribeRoom)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;syncQueue=[];syncBusy=false}mode='offline';setRoomMenu(false);try{const saved=localStorage.getItem(KEY);data=saved?normalizeData(JSON.parse(saved)):defaults()}catch(e){data=defaults()}tab='timing';showMode()}
+function enterOnline(){localExpanded.clear();mode='online';setRoomMenu(true);showMode();if(currentCode){setRoomMenu(false);return}const old=localStorage.getItem('kanuslalom-room-code');if(authReady&&old&&/^\d{6}$/.test(old))joinRoom(old)}
+function goHome(){localExpanded.clear();setRoomMenu(false);if(mode==='online'&&currentCode){if(unsubscribeRoom)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;syncQueue=[];syncBusy=false}mode='home';showMode()}
+document.getElementById('start-offline').onclick=enterOffline;
+document.getElementById('start-online').onclick=enterOnline;
+document.getElementById('back-home').onclick=goHome;
+showMode();
+
+let accountUser=null,accountAdmin=false,accountPanel='login';
+const accountView=document.getElementById('account-view');
+const accountEscape=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const accountError=e=>{const msg=String(e?.message||e);const box=document.getElementById('account-message');if(box)box.textContent=msg;else alert(msg)};
+function renderAccount(){
+ const user=accountUser;
+ if(user&&!user.isAnonymous){
+  accountView.innerHTML=`<p class="account-info">Angemeldet: ${accountEscape(user.email)}${accountAdmin?' (Administrator)':' (Sportler)'}</p>${accountAdmin?'<button class="room-btn" id="account-athletes">Sportler verwalten</button>':'<p class="account-info">Persönliche Ergebnisse werden in Phase 2 ergänzt.</p>'}<button class="room-btn secondary" id="account-logout">Abmelden</button><div id="account-message" class="account-error"></div><div id="account-admin-content"></div>`;
+  document.getElementById('account-logout').onclick=async()=>{try{await firebase.auth().signOut();await firebase.auth().signInAnonymously()}catch(e){accountError(e)}};
+  if(accountAdmin)document.getElementById('account-athletes').onclick=showAthleteAdmin;
+  return;
+ }
+ const activate=accountPanel==='activate';
+ accountView.innerHTML=`<p class="account-info">Die Zeitmessung funktioniert auch ohne Anmeldung.</p><form id="account-form">${activate?'<label>Aktivierungscode</label><input name="code" autocomplete="one-time-code" required minlength="20">':''}<label>E-Mail-Adresse</label><input name="email" type="email" autocomplete="email" required><label>${activate?'Eigenes Passwort festlegen':'Passwort'}</label><input name="password" type="password" autocomplete="${activate?'new-password':'current-password'}" minlength="8" required><button class="room-btn" type="submit">${activate?'Konto aktivieren':'Anmelden'}</button></form><button class="room-btn secondary" id="account-switch">${activate?'Zur Anmeldung':'Konto erstmals aktivieren'}</button><div id="account-message" class="account-error"></div>`;
+ document.getElementById('account-switch').onclick=()=>{accountPanel=activate?'login':'activate';renderAccount()};
+ document.getElementById('account-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);const email=String(f.get('email')).trim();const password=String(f.get('password'));try{
+ if(activate){await firebase.app().functions('europe-west1').httpsCallable('activateAthlete')({code:String(f.get('code')).trim(),email,password});accountPanel='login';}
+ await firebase.auth().signInWithEmailAndPassword(email,password);
+ }catch(err){accountError(err)}};
+}
+async function showAthleteAdmin(){
+ const el=document.getElementById('account-admin-content');if(!el)return;
+ el.innerHTML='<h3>Sportleraccount erstellen</h3><form id="new-athlete"><label>Name</label><input name="name" required maxlength="100"><label>E-Mail-Adresse</label><input name="email" type="email" required><button class="room-btn" type="submit">Aktivierungscode erstellen</button></form><p class="account-info">Der Code ist einmalig gültig und verfällt nach 7 Tagen. Gib ihn dem Sportler persönlich weiter.</p><div id="invite-output" class="account-info"></div>';
+ document.getElementById('new-athlete').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);const out=document.getElementById('invite-output');out.textContent='Erstelle Einladung …';try{const r=await firebase.app().functions('europe-west1').httpsCallable('createAthleteInvite')({name:String(f.get('name')).trim(),email:String(f.get('email')).trim()});out.textContent='Aktivierungscode für '+r.data.email+': '+r.data.code+' (gültig bis '+new Date(r.data.expiresAt).toLocaleString('de-DE')+')'}catch(err){out.textContent=String(err.message||err)}};
+}
+async function onAuthState(user){
+ accountUser=user;accountAdmin=false;
+ if(user&&!user.isAnonymous){try{const token=await user.getIdTokenResult();accountAdmin=token.claims.admin===true}catch(e){console.warn('Adminrolle konnte nicht geprüft werden',e)}}
+ authReady=!!user;renderAccount();roomUI();
+ if(mode==='online'&&!currentCode&&user){const old=localStorage.getItem('kanuslalom-room-code');if(old&&/^\d{6}$/.test(old))joinRoom(old)}
+}
+try{firebase.initializeApp(dbConfig);fbdb=firebase.database();firebase.auth().onAuthStateChanged(user=>{if(!user){firebase.auth().signInAnonymously().catch(e=>statusMsg('Anonyme Anmeldung fehlgeschlagen: '+e.message,true));return}onAuthState(user).catch(console.error)});
+fbdb.ref('.info/serverTimeOffset').on('value',s=>{serverOffset=s.val()||0});fbdb.ref('.info/connected').on('value',s=>{connected=!!s.val();if(currentCode)statusMsg(connected?'Raum '+currentCode+' verbunden':'Offline – Änderungen vorübergehend gesperrt',!connected);else if(authReady)statusMsg(connected?'Bereit – Raum erstellen oder beitreten':'Offline',!connected)})}catch(e){statusMsg('Firebase konnte nicht geladen werden: '+e.message,true)}
+</script></body></html>
