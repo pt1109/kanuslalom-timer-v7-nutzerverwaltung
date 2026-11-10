@@ -53,7 +53,41 @@ body.menu-open{overflow:hidden}
  background:#f2f5f8;
  padding:8px 0 6px;
 }
-</style></head><body><header><div class="header-content"><button class="menu-toggle" id="menu-open" aria-label="Trainingseinheit-Menü öffnen" aria-controls="rooms" aria-expanded="false">☰</button><div><h1>Kanuslalom Timer</h1><small>Trainingszeitmessung</small></div><img class="header-logo" src="logo-header.png" alt="AKV Logo"></div></header><section id="auth-screen"><div class="card"><h2>Kanuslalom Timer – Anmeldung</h2><p class="muted">Bitte melde dich mit deinem Benutzerkonto an.</p><div id="auth-form-container"></div></div></section><section id="personal-screen" style="display:none"><button class="room-btn secondary" id="personal-logout">Abmelden</button><h2>Meine Ergebnisse</h2><div id="personal-results"></div></section><section id="archive-screen" style="display:none"><h2>Gespeicherte Trainingseinheiten</h2><section class="card"><label>Trainingseinheit auswählen</label><select class="archive-select" id="archive-unit"></select><div class="row"><button id="archive-results" class="room-btn">Ergebnisse</button><button id="archive-ranking" class="room-btn secondary">Rangliste</button></div><div id="archive-content"></div></section></section><section id="admin-screen" style="display:none"><h2>Sportlerverwaltung</h2><section class="card"><div id="standalone-admin"></div></section></section><section id="mode-home"><h2>Training starten</h2><p class="intro">Wähle aus, wie du die Zeitmessung verwenden möchtest.</p><div class="mode-card"><h3>Einzelgerät</h3><div class="mode-subtitle">Offline-Modus</div><p>Zeitmessung auf einem Gerät, ohne Internetverbindung und ohne Trainingseinheit. Die Daten werden lokal gespeichert.</p><button id="start-offline">Einzelgerät starten</button></div><div class="mode-card"><h3>Gemeinsames Training</h3><div class="mode-subtitle">Online-Modus</div><p>Zeitmessung mit mehreren Trainern auf unterschiedlichen Geräten. Alle Zeiten und Ergebnisse werden automatisch synchronisiert.</p><button id="start-online">Gemeinsames Training starten</button></div></section><div id="room-overlay"></div><section id="rooms" aria-label="Trainingseinheit-Menü"><div id="room-panel"><div class="room-menu-top"><h2 id="room-menu-heading">Trainingseinheit</h2><button class="menu-close" id="menu-close" aria-label="Menü schließen">×</button></div><p class="room-status" id="firebase-status">Verbindung wird hergestellt …</p><div id="room-controls"></div><button class="room-btn secondary home-link" id="back-home">Zum Hauptmenü</button><div id="staff-extra" style="display:none"><button class="room-btn secondary home-link" id="archive-link">Gespeicherte Trainingseinheiten</button><button class="room-btn secondary home-link" id="admin-link" style="display:none">Sportler verwalten</button></div><div class="account-box" id="account-box"><h3>Benutzerkonto</h3><div id="account-view"></div></div></div></section><main id="app-main" style="display:none"><nav id="nav"></nav><div id="content"></div><p class="note">Die Daten dieser Trainingseinheit werden über Firebase synchronisiert. Für die Zeitmessung ist eine stabile Internetverbindung erforderlich. </p></main><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script><script>
+
+/* Gemeinsamer Ergebniskalender fuer Trainer und Sportler */
+.result-calendar{background:white;border:1px solid #dce3e9;border-radius:14px;padding:14px;margin-bottom:14px;touch-action:pan-y;user-select:none}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.calendar-head strong{font-size:18px;text-align:center}.calendar-head button{min-width:42px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.calendar-weekday{text-align:center;font-size:12px;color:#607384;padding:5px 0;font-weight:650}
+.calendar-day{min-width:0;min-height:57px;border:1px solid #e3e9ef;border-radius:8px;padding:5px 2px;text-align:center;background:#fafbfd}
+.calendar-day.other{opacity:.3}.calendar-day.today{border-color:#125a92}.calendar-day.has-units{background:#e7f1f9}
+.calendar-day .day-number{display:block;font-size:13px;font-weight:650}
+.calendar-day .day-count{display:block;font-size:10px;color:#125a92;margin-top:5px}
+.calendar-day.selected{background:#125a92;color:white}.calendar-day.selected .day-count{color:white}
+.calendar-unit-list{margin-top:12px;display:grid;gap:6px}.calendar-unit-list button{width:100%;text-align:left;background:#eef3f7;padding:11px}
+.calendar-unit-list button.active{background:#125a92;color:white}
+.calendar-empty{font-size:13px;color:#607384;margin:12px 0 0}
+#archive-detail[hidden],#personal-detail[hidden]{display:none!important}
+@media(max-width:390px){.result-calendar{padding:8px}.calendar-grid{gap:2px}.calendar-day{min-height:49px}.calendar-day .day-count{font-size:9px}}
+.calendar-choice-overlay{position:fixed;inset:0;background:#071c2c88;z-index:210;display:flex;align-items:center;justify-content:center;padding:18px}
+.calendar-choice-dialog{width:min(440px,100%);max-height:80vh;overflow-y:auto;background:white;border-radius:14px;padding:18px;box-shadow:0 12px 40px #0003}
+.calendar-choice-dialog .row{margin-bottom:12px}.calendar-choice-dialog h3{margin:0}
+.calendar-choice-dialog .calendar-unit-list{margin-top:0}
+.calendar-choice-dialog .calendar-unit-list button{display:block}
+#archive-screen,#personal-screen,#archive-detail,#personal-detail,#archive-content{overflow-anchor:none}
+#archive-detail .row button{flex:1}
+#archive-results.room-btn:not(.secondary),#archive-ranking.room-btn:not(.secondary){background:#125a92;color:#fff}
+#archive-results.room-btn.secondary,#archive-ranking.room-btn.secondary{background:#e7edf3;color:#183047}
+
+/* Responsive course matrix: no horizontal scrolling, even with 25 gates. */
+.course-table-wrap{width:100%;max-width:100%;overflow:visible}
+.course-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:clamp(5px,1.8vw,11px)}
+.course-table th,.course-table td{padding:5px 0;text-align:center;overflow:hidden;white-space:nowrap;border:1px solid #dce3e9;letter-spacing:-.2px}
+.course-table .course-gate{color:white;font-weight:700}.course-table .course-up{background:#b91c1c}.course-table .course-down{background:#15803d}
+.course-table .course-error{color:#b91c1c;font-weight:800;background:#fff0f0}
+@media(max-width:420px){.course-table{font-size:clamp(5px,1.55vw,8px)}.course-table th,.course-table td{padding:5px 0;letter-spacing:-.35px}}
+</style></head><body><header><div class="header-content"><button class="menu-toggle" id="menu-open" aria-label="Trainingseinheit-Menü öffnen" aria-controls="rooms" aria-expanded="false">☰</button><div><h1>Kanuslalom Timer</h1><small>Trainingszeitmessung</small></div><img class="header-logo" src="logo-header.png" alt="AKV Logo"></div></header><section id="auth-screen"><div class="card"><h2>Kanuslalom Timer – Anmeldung</h2><p class="muted">Bitte melde dich mit deinem Benutzerkonto an.</p><div id="auth-form-container"></div></div></section><section id="personal-screen" style="display:none"><button class="room-btn secondary" id="personal-logout">Abmelden</button><h2>Meine Ergebnisse</h2><div id="personal-results"></div></section><section id="archive-screen" style="display:none"><h2>Gespeicherte Ergebnisse</h2><div id="archive-calendar"></div><section class="card" id="archive-detail" hidden><div class="row"><button id="archive-results" class="room-btn">Ergebnisse</button><button id="archive-ranking" class="room-btn secondary">Rangliste</button></div><div id="archive-content"></div></section></section><section id="admin-screen" style="display:none"><h2>Sportlerverwaltung</h2><section class="card"><div id="standalone-admin"></div></section></section><section id="mode-home"><h2>Training starten</h2><p class="intro">Wähle aus, wie du die Zeitmessung verwenden möchtest.</p><div class="mode-card"><h3>Einzelgerät</h3><div class="mode-subtitle">Offline-Modus</div><p>Zeitmessung auf einem Gerät, ohne Internetverbindung und ohne Trainingseinheit. Die Daten werden lokal gespeichert.</p><button id="start-offline">Einzelgerät starten</button></div><div class="mode-card"><h3>Gemeinsames Training</h3><div class="mode-subtitle">Online-Modus</div><p>Zeitmessung mit mehreren Trainern auf unterschiedlichen Geräten. Alle Zeiten und Ergebnisse werden automatisch synchronisiert.</p><button id="start-online">Gemeinsames Training starten</button></div></section><div id="room-overlay"></div><section id="rooms" aria-label="Trainingseinheit-Menü"><div id="room-panel"><div class="room-menu-top"><h2 id="room-menu-heading">Trainingseinheit</h2><button class="menu-close" id="menu-close" aria-label="Menü schließen">×</button></div><p class="room-status" id="firebase-status">Verbindung wird hergestellt …</p><div id="room-controls"></div><button class="room-btn secondary home-link" id="back-home">Zum Hauptmenü</button><div id="staff-extra" style="display:none"><button class="room-btn secondary home-link" id="archive-link">Gespeicherte Trainingseinheiten</button><button class="room-btn secondary home-link" id="admin-link" style="display:none">Sportler verwalten</button></div><div class="account-box" id="account-box"><h3>Benutzerkonto</h3><div id="account-view"></div></div></div></section><main id="app-main" style="display:none"><nav id="nav"></nav><div id="content"></div><p class="note">Die Daten dieser Trainingseinheit werden über Firebase synchronisiert. Für die Zeitmessung ist eine stabile Internetverbindung erforderlich. </p></main><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script><script>
 function setRoomMenu(open){
   document.getElementById('rooms').classList.toggle('open',open);
   document.getElementById('room-overlay').classList.toggle('open',open);
@@ -345,40 +379,143 @@ async function publishResults(){
  const unitId=mode==='offline'?getOfflineUnitId():'online-'+currentCode;
  const unitName=mode==='offline'?'Einzelgerät · '+new Date().toLocaleDateString('de-DE'):('Trainingseinheit '+currentCode);
  status.textContent='Ergebnisse werden übertragen …';
- try{const res=await callPhase2('publishAthleteResults')({unitId,unitName,athletes});await saveArchive(unitId,unitName);status.textContent=`Gespeichert: ${res.data.runs} Läufe für ${res.data.athletes} Sportler.`}
+ try{const res=await callPhase2('publishAthleteResults')({unitId,unitName,athletes,course:currentCourse()});await saveArchive(unitId,unitName);status.textContent=`Gespeichert: ${res.data.runs} Läufe für ${res.data.athletes} Sportler.`}
  catch(e){status.textContent='Speichern fehlgeschlagen: '+(e.message||e)}
 }
+function currentCourse(){return {gateCount:data.gateCount,gates:data.gates.slice(0,data.gateCount).map(g=>({id:g.id,num:g.num,up:!!g.up}))}}
 async function saveArchive(unitId,unitName){
  const athletes=data.athletes.map(a=>({name:a.name,accountUid:a.accountUid||null,runs:a.runs}));
- await callPhase2('saveTrainingArchive')({unitId,unitName,athletes});
+ await callPhase2('saveTrainingArchive')({unitId,unitName,athletes,course:currentCourse()});
 }
 let archiveUnits=[],archiveSelected=null,archiveMode='results';
-async function loadArchives(){
- const el=document.getElementById('archive-content'),select=document.getElementById('archive-unit');el.textContent='Lade Trainingseinheiten …';
- try{const res=await callPhase2('listTrainingArchives')({});archiveUnits=res.data.units||[];select.replaceChildren();
-  for(const u of archiveUnits){const o=document.createElement('option');o.value=u.unitId;o.textContent=u.unitName;select.appendChild(o)}
-  if(!archiveUnits.length){el.textContent='Noch keine Trainingseinheiten im Archiv gespeichert.';return}
-  archiveSelected=archiveUnits[0].unitId;select.value=archiveSelected;await showArchiveUnit();
- }catch(e){el.textContent='Archiv konnte nicht geladen werden: '+e.message}
+const calendarState={staff:{month:new Date().getFullYear()*12+new Date().getMonth(),day:null,selected:null,units:[]},personal:{month:new Date().getFullYear()*12+new Date().getMonth(),day:null,selected:null,units:[]}};
+function dateKey(timestamp){
+ const t=Number(timestamp);if(!Number.isFinite(t)||t<=0)return null;
+ const d=new Date(t);if(Number.isNaN(d.getTime()))return null;
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-async function showArchiveUnit(){
- const el=document.getElementById('archive-content');el.textContent='Lade Ergebnisse …';
- try{const res=await callPhase2('getTrainingArchive')({unitId:archiveSelected});const athletes=res.data.athletes||[];
+function calendarDateOf(u,kind){return dateKey(kind==='staff'?(u.trainingAt||u.createdAt||u.updatedAt):(u.trainingAt||u.createdAt||u.publishedAt));}
+function calendarMonthLabel(m){const d=new Date(Math.floor(m/12),((m%12)+12)%12,1);return d.toLocaleDateString('de-DE',{month:'long',year:'numeric'});}
+function preservePagePosition(action){
+ // Keep the viewport anchored to its actual page position even if a calendar
+ // rerender or a shorter result table triggers browser scroll anchoring.
+ const y=window.scrollY;
+ const result=action();
+ const restore=()=>window.scrollTo({top:y,left:window.scrollX,behavior:'instant'});
+ restore();requestAnimationFrame(restore);
+ return result;
+}
+function updateArchiveModeButtons(){
+ const results=document.getElementById('archive-results'),ranking=document.getElementById('archive-ranking');
+ results.classList.toggle('secondary',archiveMode!=='results');
+ ranking.classList.toggle('secondary',archiveMode!=='ranking');
+ results.setAttribute('aria-pressed',String(archiveMode==='results'));
+ ranking.setAttribute('aria-pressed',String(archiveMode==='ranking'));
+}
+let cachedArchiveId=null,cachedArchiveAthletes=null,cachedArchiveCourse=null;
+// Compact table: all gates remain visible without horizontal scrolling.
+function resultGateTable(runs,course){
+ const gates=course?.gates?.slice(0,course.gateCount)||[];
+ if(!gates.length)return '<table><tr><th>Lauf</th><th>Fahrzeit</th><th>Strafe</th><th>Gesamt</th></tr>'+runs.map(r=>`<tr><td>${r.number}</td><td>${fmt(r.elapsed)}</td><td>+${r.penalty}s</td><td>${fmt(r.total)}</td></tr>`).join('')+'</table><p class="muted">Für diese ältere Einheit wurde keine Streckenkonfiguration gespeichert.</p>';
+ const n=gates.length;
+ const head=gates.map(g=>`<th class="course-gate ${g.up?'course-up':'course-down'}" title="Tor ${escapeHTML(g.num)}">${escapeHTML(g.num)}</th>`).join('');
+ const rows=runs.map(r=>`<tr><td>${r.number}</td>${gates.map(g=>{const p=Number(r.penalties?.[g.id]||0);return `<td class="course-pen ${p?'course-error':''}">${p?'+'+p:'–'}</td>`}).join('')}<td>${fmt(r.total)}</td></tr>`).join('');
+ return `<div class="course-table-wrap"><table class="course-table" style="--gate-count:${n}"><colgroup><col style="width:7%">${gates.map(()=>`<col style="width:${(78/n).toFixed(4)}%">`).join('')}<col style="width:15%"></colgroup><thead><tr><th>Lauf</th>${head}<th>Gesamt</th></tr></thead><tbody>${rows}</tbody></table></div><p class="muted">Fahrzeit und Strafzeit ergeben die Gesamtzeit. Fehler stehen direkt unter dem jeweiligen Tor.</p>`;
+}
+function renderArchiveAthletes(athletes){
+ const el=document.getElementById('archive-content'),detail=document.getElementById('archive-detail');
+ const y=window.scrollY;detail.style.minHeight=Math.max(detail.getBoundingClientRect().height,detail.offsetHeight)+'px';
  if(archiveMode==='ranking'){
   const ranked=athletes.filter(a=>a.runs?.length).map(a=>({name:a.name,best:a.runs.reduce((x,y)=>x.total<y.total?x:y)})).sort((a,b)=>a.best.total-b.best.total);
   el.innerHTML='<h3>Rangliste – bester Lauf</h3>'+(ranked.length?'<table><tr><th>Pl.</th><th>Sportler</th><th>Lauf</th><th>Strafe</th><th>Gesamt</th></tr>'+ranked.map((a,i)=>`<tr><td>${i+1}</td><td>${escapeHTML(a.name)}</td><td>${a.best.number}</td><td>+${a.best.penalty}s</td><td>${fmt(a.best.total)}</td></tr>`).join('')+'</table>':'Noch keine gespeicherten Läufe.');
- }else el.innerHTML=athletes.map(a=>`<div class="personal-unit"><h3>${escapeHTML(a.name)}</h3>${a.runs?.length?'<table><tr><th>Lauf</th><th>Fahrzeit</th><th>Strafe</th><th>Gesamt</th></tr>'+a.runs.map(r=>`<tr><td>${r.number}</td><td>${fmt(r.elapsed)}</td><td>+${r.penalty}s</td><td>${fmt(r.total)}</td></tr>`).join('')+'</table>':'Noch keine Läufe.'}</div>`).join('');
- }catch(e){el.textContent='Ergebnisse konnten nicht geladen werden: '+e.message}
+ }else el.innerHTML=athletes.map(a=>`<div class="personal-unit"><h3>${escapeHTML(a.name)}</h3>${a.runs?.length?resultGateTable(a.runs,cachedArchiveCourse):'Noch keine Läufe.'}</div>`).join('');
+ updateArchiveModeButtons();window.scrollTo({top:y,behavior:'instant'});requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));
 }
-document.getElementById('archive-unit').onchange=e=>{archiveSelected=e.target.value;showArchiveUnit()};
-document.getElementById('archive-results').onclick=()=>{archiveMode='results';showArchiveUnit()};
-document.getElementById('archive-ranking').onclick=()=>{archiveMode='ranking';showArchiveUnit()};
+function renderResultCalendar(kind){
+ const st=calendarState[kind],container=document.getElementById(kind==='staff'?'archive-calendar':'personal-results');
+ if(!container)return;
+ const year=Math.floor(st.month/12),month=((st.month%12)+12)%12;
+ const first=new Date(year,month,1),offset=(first.getDay()+6)%7,last=new Date(year,month+1,0).getDate();
+ const counts=new Map();for(const u of st.units){const key=calendarDateOf(u,kind);if(key)counts.set(key,(counts.get(key)||0)+1)}
+ const today=dateKey(Date.now());
+ let html=`<div class="result-calendar" data-calendar="${kind}"><div class="calendar-head"><button type="button" data-cal-nav="-1" aria-label="Vorheriger Monat">‹</button><strong>${calendarMonthLabel(st.month)}</strong><button type="button" data-cal-nav="1" aria-label="Nächster Monat">›</button></div><div class="calendar-grid">${['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="calendar-weekday">${d}</div>`).join('')}`;
+ for(let i=0;i<Math.ceil((offset+last)/7)*7;i++){
+  const day=i-offset+1;
+  if(day<1||day>last){html+='<div class="calendar-day other" aria-hidden="true"></div>';continue}
+  const key=`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`,count=counts.get(key)||0;
+  html+=`<button type="button" class="calendar-day ${count?'has-units':''} ${key===today?'today':''} ${st.day===key?'selected':''}" data-cal-day="${key}" aria-label="${day}. ${month+1}. ${year}, ${count} Trainingseinheiten"><span class="day-number">${day}</span>${count?`<span class="day-count">${count} ${count===1?'Einheit':'Einheiten'}</span>`:''}</button>`;
+ }
+ html+='</div>';
+ html+='</div>';
+ container.innerHTML=html;
+ const calendar=container.querySelector('.result-calendar');
+ const openUnit=u=>{
+  st.selected=u.unitId||u.id;
+  preservePagePosition(()=>{
+   renderResultCalendar(kind);
+   if(kind==='staff'){archiveSelected=u.unitId||u.id;showArchiveUnit()}else showPersonalUnit(u);
+  });
+ };
+ const closeChoice=()=>document.getElementById('calendar-choice-overlay')?.remove();
+ calendar.querySelectorAll('[data-cal-nav]').forEach(b=>b.onclick=()=>{closeChoice();st.month+=Number(b.dataset.calNav);st.day=null;st.selected=null;renderResultCalendar(kind);hideResultDetail(kind)});
+ calendar.querySelectorAll('[data-cal-day]').forEach(b=>b.onclick=()=>{
+  closeChoice();st.day=b.dataset.calDay;st.selected=null;
+  const items=st.units.filter(u=>calendarDateOf(u,kind)===st.day);
+  if(items.length===1){openUnit(items[0]);return}
+  preservePagePosition(()=>{renderResultCalendar(kind);hideResultDetail(kind)});
+  if(items.length<2)return;
+  const overlay=document.createElement('div');overlay.id='calendar-choice-overlay';overlay.className='calendar-choice-overlay';
+  const dialog=document.createElement('div');dialog.className='calendar-choice-dialog';dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','Trainingseinheit auswählen');
+  const heading=document.createElement('div');heading.className='row';
+  const title=document.createElement('h3');title.textContent='Trainingseinheit auswählen';
+  const close=document.createElement('button');close.type='button';close.className='small-btn';close.textContent='Schließen';close.onclick=closeChoice;
+  heading.append(title,close);dialog.append(heading);
+  const list=document.createElement('div');list.className='calendar-unit-list';
+  items.forEach(u=>{const button=document.createElement('button');button.type='button';button.textContent=u.unitName||'Trainingseinheit';button.onclick=()=>{closeChoice();openUnit(u)};list.append(button)});
+  dialog.append(list);overlay.append(dialog);overlay.addEventListener('click',e=>{if(e.target===overlay)closeChoice()});
+  document.body.append(overlay);close.focus({preventScroll:true});
+ });
+ let touch=null;
+ calendar.addEventListener('touchstart',e=>{if(e.touches.length===1)touch={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+ calendar.addEventListener('touchend',e=>{if(!touch||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;touch=null;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.3){st.month+=dx<0?1:-1;st.day=null;st.selected=null;renderResultCalendar(kind);hideResultDetail(kind)}},{passive:true});
+}
+function hideResultDetail(kind){const el=document.getElementById(kind==='staff'?'archive-detail':'personal-detail');if(el)el.hidden=true;}
+async function loadArchives(){
+ const container=document.getElementById('archive-calendar');container.textContent='Trainingseinheiten werden geladen …';hideResultDetail('staff');
+ try{const res=await callPhase2('listTrainingArchives')({});archiveUnits=res.data.units||[];const st=calendarState.staff;st.units=archiveUnits;st.day=null;st.selected=null;renderResultCalendar('staff');
+  if(!archiveUnits.length)container.insertAdjacentHTML('beforeend','<p class="muted">Noch keine Trainingseinheiten im Archiv gespeichert.</p>');
+ }catch(e){container.textContent='Archiv konnte nicht geladen werden: '+(e.message||e)}
+}
+async function showArchiveUnit(){
+ const detail=document.getElementById('archive-detail'),el=document.getElementById('archive-content');
+ const selected=archiveSelected;
+ updateArchiveModeButtons();
+ if(cachedArchiveId===selected&&cachedArchiveAthletes){
+  preservePagePosition(()=>{detail.hidden=false;renderArchiveAthletes(cachedArchiveAthletes)});
+  return;
+ }
+ const y=window.scrollY;
+ preservePagePosition(()=>{detail.hidden=false;el.textContent='Lade Ergebnisse …'});
+ try{
+  const res=await callPhase2('getTrainingArchive')({unitId:selected});
+  if(archiveSelected!==selected)return;
+  cachedArchiveId=selected;cachedArchiveAthletes=res.data.athletes||[];cachedArchiveCourse=res.data.course||null;
+  renderArchiveAthletes(cachedArchiveAthletes);
+  window.scrollTo({top:y,behavior:'instant'});
+  requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));
+ }catch(e){preservePagePosition(()=>{el.textContent='Ergebnisse konnten nicht geladen werden: '+(e.message||e)})}
+}
+document.getElementById('archive-results').onclick=()=>{archiveMode='results';updateArchiveModeButtons();if(archiveSelected)showArchiveUnit()};
+document.getElementById('archive-ranking').onclick=()=>{archiveMode='ranking';updateArchiveModeButtons();if(archiveSelected)showArchiveUnit()};
+function showPersonalUnit(u){
+ let detail=document.getElementById('personal-detail');if(!detail){detail=document.createElement('section');detail.id='personal-detail';detail.className='card';document.getElementById('personal-results').after(detail)}
+ preservePagePosition(()=>{detail.hidden=false;
+ detail.innerHTML=`<h3>${escapeHTML(u.unitName||'Training')}</h3>${resultGateTable(u.runs||[],u.course)}`});
+}
 async function showMyResults(){
- const box=document.getElementById('personal-results');if(!box)return;
- box.textContent='Ergebnisse werden geladen …';
- try{const result=await callPhase2('getMyAthleteResults')({});const units=result.data.units||[];
-  if(!units.length){box.textContent='Noch keine veröffentlichten Ergebnisse vorhanden.';return}
-  box.innerHTML=units.map(u=>`<div class="personal-unit"><h4>${escapeHTML(u.unitName||'Training')}</h4><small>${u.publishedAt?new Date(u.publishedAt).toLocaleDateString('de-DE'):''}</small><table><tr><th>Lauf</th><th>Fahrzeit</th><th>Strafe</th><th>Gesamt</th></tr>${(u.runs||[]).map(r=>`<tr><td>${r.number}</td><td>${fmt(r.elapsed)}</td><td>+${r.penalty}s</td><td>${fmt(r.total)}</td></tr>`).join('')}</table></div>`).join('');
+ const box=document.getElementById('personal-results');box.textContent='Ergebnisse werden geladen …';hideResultDetail('personal');
+ try{const result=await callPhase2('getMyAthleteResults')({});const st=calendarState.personal;st.units=result.data.units||[];st.day=null;st.selected=null;renderResultCalendar('personal');
+  if(!st.units.length)box.insertAdjacentHTML('beforeend','<p class="muted">Noch keine veröffentlichten Ergebnisse vorhanden.</p>');
  }catch(e){box.textContent='Ergebnisse konnten nicht geladen werden: '+(e.message||e)}
 }
 </script></body></html>
