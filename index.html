@@ -35,7 +35,9 @@ body.menu-open{overflow:hidden}
 #auth-screen input{display:block;width:100%;padding:11px;border:1px solid #ccd6df;border-radius:8px;margin:5px 0 12px;font:inherit}
 #auth-screen label{font-size:13px}#auth-screen button{margin:5px 5px 5px 0}
 #account-box{border-top:1px solid #dce3e9}
-#mode-home,#app-main,#rooms{display:none}
+#mode-home,#app-main{display:none}
+/* Seitenmenue bleibt im DOM sichtbar und wird per transform/visibility ein- und ausgefahren. */
+#rooms{display:block}
 .athlete-name-wrap.linked:before{content:'♙';display:none}
 .athlete-name-wrap.linked .linked-icon{position:absolute;left:9px;top:9px;width:17px;height:17px;pointer-events:none;color:#15803d}
 .athlete-name-wrap.linked input{padding-left:31px}
