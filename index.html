@@ -91,6 +91,14 @@ body.personal-view #account-box{border-top:0;margin-top:0;padding-top:0}
 @media(max-width:420px){.course-table{font-size:clamp(5px,1.55vw,8px)}.course-table th,.course-table td{padding:5px 0;letter-spacing:-.35px}}
 </style><style>
 #admin-screen .managed-user{border:1px solid #d7e0e8;border-radius:10px;padding:12px;margin:10px 0;background:#fff;overflow-wrap:anywhere}
+#admin-screen .managed-user-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;background:transparent;padding:0;color:inherit}
+#admin-screen .managed-user-identity{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+#admin-screen .managed-user-identity small{color:#607384}
+#admin-screen .managed-user-identity .account-info{overflow-wrap:anywhere}
+#admin-screen .managed-user-chevron{font-size:22px;color:#607384;transition:transform .15s ease;flex-shrink:0}
+#admin-screen .managed-user-trigger[aria-expanded="true"] .managed-user-chevron{transform:rotate(180deg)}
+#admin-screen .managed-user-details[hidden]{display:none}
+#admin-screen .managed-user-trigger:focus-visible{outline:2px solid #125a92;outline-offset:5px}
 #admin-screen .managed-user-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
 #admin-screen .managed-user-head small{color:#607384}
 #admin-screen .managed-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
@@ -342,11 +350,13 @@ async function refreshAdminData(){
 }
 function renderManagedUsers(){
  const el=document.getElementById('admin-users');if(!el)return;
- const users=managedUsers.filter(u=>u.role!=='admin');
+ const users=managedUsers.filter(u=>u.role!=='admin').sort((a,b)=>{const rank=u=>u.role==='trainer'?0:1;return rank(a)-rank(b)||String(a.name||a.email||'').localeCompare(String(b.name||b.email||''),'de',{sensitivity:'base'})});
  el.replaceChildren();if(!users.length){el.textContent='Keine Benutzer vorhanden.';return}
  for(const u of users){
   const card=document.createElement('div');card.className='managed-user';
-  card.innerHTML=`<div class="managed-user-head"><strong>${escapeHTML(u.name||u.email)}</strong><small>${u.role==='trainer'?'Trainer':'Sportler'} · ${u.disabled?'Deaktiviert':'Aktiv'}</small></div><div class="account-info">${escapeHTML(u.email)}</div><div class="managed-actions"><button class="room-btn secondary" data-edit>Bearbeiten</button><button class="room-btn secondary" data-toggle>${u.disabled?'Reaktivieren':'Deaktivieren'}</button><button class="room-btn secondary" data-delete>Löschen</button></div><div class="managed-editor" hidden></div>`;
+  card.innerHTML=`<button type="button" class="managed-user-trigger" aria-expanded="false"><span class="managed-user-identity"><strong>${escapeHTML(u.name||u.email)}</strong><small>${u.role==='trainer'?'Trainer':'Sportler'} · ${u.disabled?'Deaktiviert':'Aktiv'}</small><span class="account-info">${escapeHTML(u.email)}</span></span><span class="managed-user-chevron" aria-hidden="true">⌄</span></button><div class="managed-user-details" hidden><div class="managed-actions"><button class="room-btn secondary" data-edit>Bearbeiten</button><button class="room-btn secondary" data-toggle>${u.disabled?'Reaktivieren':'Deaktivieren'}</button><button class="room-btn secondary" data-delete>Löschen</button></div><div class="managed-editor" hidden></div></div>`;
+  const trigger=card.querySelector('.managed-user-trigger'),details=card.querySelector('.managed-user-details');
+  trigger.onclick=()=>{details.hidden=!details.hidden;trigger.setAttribute('aria-expanded',String(!details.hidden));if(details.hidden)card.querySelector('.managed-editor').hidden=true};
   card.querySelector('[data-edit]').onclick=()=>openUserEditor(card,u);
   card.querySelector('[data-toggle]').onclick=async()=>{
    const action=u.disabled?'reaktivieren':'deaktivieren';if(!confirm(`Konto ${u.email} wirklich ${action}?`))return;
