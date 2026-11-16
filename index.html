@@ -106,7 +106,17 @@ body.personal-view #account-box{border-top:0;margin-top:0;padding-top:0}
 #admin-screen label{display:block;font-size:13px;margin-top:8px}
 #admin-screen .managed-editor{border-top:1px solid #d7e0e8;margin-top:10px;padding-top:8px}
 #admin-screen .managed-editor[hidden]{display:none}
-</style></head><body><header><div class="header-content"><button class="menu-toggle" id="menu-open" aria-label="Trainingseinheit-Menü öffnen" aria-controls="rooms" aria-expanded="false">☰</button><div><h1>Kanuslalom Timer</h1><small>Trainingszeitmessung</small></div><img class="header-logo" src="logo-header.png" alt="AKV Logo"></div></header><section id="auth-screen"><div class="card"><h2>Kanuslalom Timer – Anmeldung</h2><p class="muted">Bitte melde dich mit deinem Benutzerkonto an.</p><div id="auth-form-container"></div></div></section><section id="personal-screen" style="display:none"><h2>Meine Ergebnisse</h2><div id="personal-results"></div></section><section id="archive-screen" style="display:none"><h2>Gespeicherte Ergebnisse</h2><div id="archive-calendar"></div><section class="card" id="archive-detail" hidden><div class="row"><button id="archive-results" class="room-btn">Ergebnisse</button><button id="archive-ranking" class="room-btn secondary">Rangliste</button></div><div id="archive-content"></div></section></section><section id="admin-screen" style="display:none"><h2>Benutzerverwaltung</h2><section class="card"><div id="standalone-admin"></div></section></section><section id="mode-home"><h2>Training starten</h2><p class="intro">Wähle aus, wie du die Zeitmessung verwenden möchtest.</p><div class="mode-card"><h3>Einzelgerät</h3><div class="mode-subtitle">Offline-Modus</div><p>Zeitmessung auf einem Gerät, ohne Internetverbindung und ohne Trainingseinheit. Die Daten werden lokal gespeichert.</p><button id="start-offline">Einzelgerät starten</button></div><div class="mode-card"><h3>Gemeinsames Training</h3><div class="mode-subtitle">Online-Modus</div><p>Zeitmessung mit mehreren Trainern auf unterschiedlichen Geräten. Alle Zeiten und Ergebnisse werden automatisch synchronisiert.</p><button id="start-online">Gemeinsames Training starten</button></div></section><div id="room-overlay"></div><section id="rooms" aria-label="Trainingseinheit-Menü"><div id="room-panel"><div class="room-menu-top"><h2 id="room-menu-heading">Trainingseinheit</h2><button class="menu-close" id="menu-close" aria-label="Menü schließen">×</button></div><p class="room-status" id="firebase-status">Verbindung wird hergestellt …</p><div id="room-controls"></div><button class="room-btn secondary home-link" id="back-home">Zum Hauptmenü</button><div id="staff-extra" style="display:none"><button class="room-btn secondary home-link" id="archive-link">Gespeicherte Trainingseinheiten</button><button class="room-btn secondary home-link" id="admin-link" style="display:none">Benutzerverwaltung</button></div><div class="account-box" id="account-box"><h3>Benutzerkonto</h3><div id="account-view"></div></div></div></section><main id="app-main" style="display:none"><nav id="nav"></nav><div id="content"></div><p class="note">Die Daten dieser Trainingseinheit werden über Firebase synchronisiert. Für die Zeitmessung ist eine stabile Internetverbindung erforderlich. </p></main><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script><script>
+</style><style>
+#rooms-admin-screen .managed-room{border:1px solid #d7e0e8;border-radius:10px;padding:12px;margin:10px 0;background:#fff;overflow-wrap:anywhere}
+#rooms-admin-screen .room-admin-trigger{width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;gap:12px;background:transparent;color:inherit;padding:0}
+#rooms-admin-screen .room-admin-identity{display:flex;flex-direction:column;gap:4px;min-width:0}
+#rooms-admin-screen .room-admin-identity small{color:#607384}
+#rooms-admin-screen .room-admin-details[hidden]{display:none}
+#rooms-admin-screen .room-admin-details{border-top:1px solid #d7e0e8;margin-top:10px;padding-top:10px}
+#rooms-admin-screen .room-admin-actions{display:flex;flex-wrap:wrap;gap:8px}
+#rooms-admin-screen .room-admin-actions button{width:auto;flex:1;min-width:90px}
+#rooms-admin-screen .room-admin-trigger:focus-visible{outline:2px solid #125a92;outline-offset:4px}
+</style></head><body><header><div class="header-content"><button class="menu-toggle" id="menu-open" aria-label="Trainingseinheit-Menü öffnen" aria-controls="rooms" aria-expanded="false">☰</button><div><h1>Kanuslalom Timer</h1><small>Trainingszeitmessung</small></div><img class="header-logo" src="logo-header.png" alt="AKV Logo"></div></header><section id="auth-screen"><div class="card"><h2>Kanuslalom Timer – Anmeldung</h2><p class="muted">Bitte melde dich mit deinem Benutzerkonto an.</p><div id="auth-form-container"></div></div></section><section id="personal-screen" style="display:none"><h2>Meine Ergebnisse</h2><div id="personal-results"></div></section><section id="archive-screen" style="display:none"><h2>Gespeicherte Ergebnisse</h2><div id="archive-calendar"></div><section class="card" id="archive-detail" hidden><div class="row"><button id="archive-results" class="room-btn">Ergebnisse</button><button id="archive-ranking" class="room-btn secondary">Rangliste</button></div><div id="archive-content"></div></section></section><section id="admin-screen" style="display:none"><h2>Benutzerverwaltung</h2><section class="card"><div id="standalone-admin"></div></section></section><section id="rooms-admin-screen" style="display:none"><h2>Trainingseinheiten verwalten</h2><section class="card"><p class="account-info">Aktive und geschlossene gemeinsame Trainingseinheiten. Archivierte Ergebnisse bleiben beim Löschen eines Raums erhalten.</p><button class="room-btn secondary" id="refresh-admin-rooms">Liste aktualisieren</button><div id="admin-room-list" role="status">Trainingseinheiten werden geladen …</div><p id="admin-room-feedback" role="status"></p></section></section><section id="mode-home"><h2>Training starten</h2><p class="intro">Wähle aus, wie du die Zeitmessung verwenden möchtest.</p><div class="mode-card"><h3>Einzelgerät</h3><div class="mode-subtitle">Offline-Modus</div><p>Zeitmessung auf einem Gerät, ohne Internetverbindung und ohne Trainingseinheit. Die Daten werden lokal gespeichert.</p><button id="start-offline">Einzelgerät starten</button></div><div class="mode-card"><h3>Gemeinsames Training</h3><div class="mode-subtitle">Online-Modus</div><p>Zeitmessung mit mehreren Trainern auf unterschiedlichen Geräten. Alle Zeiten und Ergebnisse werden automatisch synchronisiert.</p><button id="start-online">Gemeinsames Training starten</button></div></section><div id="room-overlay"></div><section id="rooms" aria-label="Trainingseinheit-Menü"><div id="room-panel"><div class="room-menu-top"><h2 id="room-menu-heading">Trainingseinheit</h2><button class="menu-close" id="menu-close" aria-label="Menü schließen">×</button></div><p class="room-status" id="firebase-status">Verbindung wird hergestellt …</p><div id="room-controls"></div><button class="room-btn secondary home-link" id="back-home">Zum Hauptmenü</button><div id="staff-extra" style="display:none"><button class="room-btn secondary home-link" id="archive-link">Gespeicherte Trainingseinheiten</button><button class="room-btn secondary home-link" id="admin-link" style="display:none">Benutzerverwaltung</button><button class="room-btn secondary home-link" id="rooms-admin-link" style="display:none">Trainingseinheiten verwalten</button></div><div class="account-box" id="account-box"><h3>Benutzerkonto</h3><div id="account-view"></div></div></div></section><main id="app-main" style="display:none"><nav id="nav"></nav><div id="content"></div><p class="note">Die Daten dieser Trainingseinheit werden über Firebase synchronisiert. Für die Zeitmessung ist eine stabile Internetverbindung erforderlich. </p></main><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script><script>
 function setRoomMenu(open){
   document.getElementById('rooms').classList.toggle('open',open);
   document.getElementById('room-overlay').classList.toggle('open',open);
@@ -248,9 +258,11 @@ if(currentCode){el.innerHTML=`<p>Raumcode: <span class="room-code">${currentCode
 el.innerHTML='<label for="room-name">Name der neuen Trainingseinheit (optional)</label><input class="room-input" id="room-name" maxlength="60" placeholder="z. B. Eiskanal Samstag"><button class="room-btn" id="create-room">+ Trainingseinheit erstellen</button><hr><label for="join-code">Bestehender Trainingseinheit beitreten</label><input class="room-input" id="join-code" inputmode="numeric" maxlength="6" placeholder="Sechsstelliger Zugangscode"><button class="room-btn secondary" id="join-room">Raum beitreten</button>';
 document.getElementById('create-room').onclick=createRoom;document.getElementById('join-room').onclick=()=>joinRoom(document.getElementById('join-code').value.trim());}
 async function createRoom(){if(!isStaff())return;if(!connected){alert('Keine Verbindung zur Datenbank.');return}const name=document.getElementById('room-name').value.trim().slice(0,60);statusMsg('Trainingseinheit wird erstellt …');for(let i=0;i<8;i++){const a=new Uint32Array(1);crypto.getRandomValues(a);const code=String(100000+a[0]%900000);const ref=fbdb.ref('rooms/'+code);try{const result=await ref.transaction(old=>old===null?{name:name||'Training',createdAt:firebase.database.ServerValue.TIMESTAMP,data:defaults()}:undefined,undefined,false);if(result.committed){openRoom(code);return}}catch(e){statusMsg('Erstellen fehlgeschlagen: '+e.message,true);return}}statusMsg('Keinen freien Raumcode gefunden. Bitte erneut versuchen.',true)}
-async function joinRoom(code){if(!isStaff())return;if(!/^\d{6}$/.test(code)){alert('Bitte einen sechsstelligen Code eingeben.');return}statusMsg('Trainingseinheit wird gesucht …');try{const snap=await fbdb.ref('rooms/'+code).once('value');if(!snap.exists()){statusMsg('Trainingseinheit nicht gefunden.',true);return}openRoom(code)}catch(e){statusMsg('Beitritt fehlgeschlagen: '+e.message,true)}}
-function openRoom(code){if(!isStaff())return;localExpanded.clear();mode='online';showMode();setRoomMenu(false);syncQueue=[];syncBusy=false;deferredSnapshot=null;if(unsubscribeRoom)unsubscribeRoom();currentCode=code;localStorage.setItem('kanuslalom-room-code',code);roomRef=fbdb.ref('rooms/'+code+'/data');document.getElementById('app-main').style.display='block';roomUI();unsubscribeRoom=roomRef.on('value',snap=>{if(!snap.exists()){statusMsg('Dieser Trainingseinheit wurde gelöscht.',true);leaveRoom();return}if(syncBusy || syncQueue.length){return}data=normalizeData(snap.val());render() },e=>statusMsg('Lesen fehlgeschlagen: '+e.message,true));statusMsg('Trainingseinheit '+code+' verbunden')}
-function leaveRoom(){localExpanded.clear();setRoomMenu(false);syncQueue=[];syncBusy=false;deferredSnapshot=null;if(unsubscribeRoom&&roomRef)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;localStorage.removeItem('kanuslalom-room-code');document.getElementById('app-main').style.display='none';data=defaults();roomUI();statusMsg(connected?'Bereit – Raum erstellen oder beitreten':'Offline',!connected);if(mode==='online')setRoomMenu(true)}
+async function joinRoom(code){if(!isStaff())return;if(!/^\d{6}$/.test(code)){alert('Bitte einen sechsstelligen Code eingeben.');return}statusMsg('Trainingseinheit wird gesucht …');try{const snap=await fbdb.ref('rooms/'+code).once('value');if(!snap.exists()){statusMsg('Trainingseinheit nicht gefunden.',true);return}if(snap.val()?.status==='closed'){statusMsg('Diese Trainingseinheit ist geschlossen.',true);return}openRoom(code)}catch(e){statusMsg('Beitritt fehlgeschlagen: '+e.message,true)}}
+let roomStatusRef=null,roomStatusListener=null;
+function clearRoomStatusListener(){if(roomStatusRef&&roomStatusListener)roomStatusRef.off('value',roomStatusListener);roomStatusRef=null;roomStatusListener=null;}
+function openRoom(code){if(!isStaff())return;localExpanded.clear();mode='online';showMode();setRoomMenu(false);syncQueue=[];syncBusy=false;deferredSnapshot=null;if(unsubscribeRoom)unsubscribeRoom();clearRoomStatusListener();currentCode=code;roomStatusRef=fbdb.ref('rooms/'+code+'/status');roomStatusListener=roomStatusRef.on('value',s=>{if(s.val()==='closed'&&currentCode===code){alert('Diese Trainingseinheit wurde durch einen Administrator geschlossen.');leaveRoom();}});localStorage.setItem('kanuslalom-room-code',code);roomRef=fbdb.ref('rooms/'+code+'/data');document.getElementById('app-main').style.display='block';roomUI();unsubscribeRoom=roomRef.on('value',snap=>{if(!snap.exists()){statusMsg('Dieser Trainingseinheit wurde gelöscht.',true);leaveRoom();return}if(syncBusy || syncQueue.length){return}data=normalizeData(snap.val());render() },e=>statusMsg('Lesen fehlgeschlagen: '+e.message,true));statusMsg('Trainingseinheit '+code+' verbunden')}
+function leaveRoom(){clearRoomStatusListener();localExpanded.clear();setRoomMenu(false);syncQueue=[];syncBusy=false;deferredSnapshot=null;if(unsubscribeRoom&&roomRef)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;localStorage.removeItem('kanuslalom-room-code');document.getElementById('app-main').style.display='none';data=defaults();roomUI();statusMsg(connected?'Bereit – Raum erstellen oder beitreten':'Offline',!connected);if(mode==='online')setRoomMenu(true)}
 // Apply only changed fields in a transaction, preserving concurrent edits on other athletes/gates.
 let syncQueue=[],syncBusy=false,deferredSnapshot=null;
 function syncDelta(before,after){if(!roomRef)return;const changes=[];if(before.gateCount!==after.gateCount)changes.push(['gateCount',after.gateCount]);for(let i=0;i<25;i++){const b=before.gates[i],a=after.gates[i];if(JSON.stringify(b)!==JSON.stringify(a))changes.push(['gate',i,a])}
@@ -285,15 +297,16 @@ function drainSyncQueue(){
   });
 }
 if(changes.length){syncQueue.push(changes);drainSyncQueue()} }
-function showMode(){document.body.classList.remove('personal-view');if(!isStaff()){document.getElementById('mode-home').style.display='none';document.getElementById('app-main').style.display='none';return}for(const id of ['auth-screen','personal-screen','archive-screen','admin-screen'])document.getElementById(id).style.display='none';document.getElementById('mode-home').style.display=mode==='home'?'block':'none';document.getElementById('app-main').style.display=mode==='offline'||(mode==='online'&&!!currentCode)?'block':'none';document.getElementById('menu-open').style.visibility=isStaff()?'visible':'hidden';roomUI();if(mode==='offline'||(mode==='online'&&currentCode))render()}
-function enterOffline(){if(!isStaff())return;localExpanded.clear();if(roomRef){if(unsubscribeRoom)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;syncQueue=[];syncBusy=false}mode='offline';setRoomMenu(false);try{const saved=localStorage.getItem(KEY);data=saved?normalizeData(JSON.parse(saved)):defaults()}catch(e){data=defaults()}tab='timing';showMode()}
+function showMode(){document.body.classList.remove('personal-view');if(!isStaff()){document.getElementById('mode-home').style.display='none';document.getElementById('app-main').style.display='none';return}for(const id of ['auth-screen','personal-screen','archive-screen','admin-screen','rooms-admin-screen'])document.getElementById(id).style.display='none';document.getElementById('mode-home').style.display=mode==='home'?'block':'none';document.getElementById('app-main').style.display=mode==='offline'||(mode==='online'&&!!currentCode)?'block':'none';document.getElementById('menu-open').style.visibility=isStaff()?'visible':'hidden';roomUI();if(mode==='offline'||(mode==='online'&&currentCode))render()}
+function enterOffline(){if(!isStaff())return;clearRoomStatusListener();localExpanded.clear();if(roomRef){if(unsubscribeRoom)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;syncQueue=[];syncBusy=false}mode='offline';setRoomMenu(false);try{const saved=localStorage.getItem(KEY);data=saved?normalizeData(JSON.parse(saved)):defaults()}catch(e){data=defaults()}tab='timing';showMode()}
 function enterOnline(){if(!isStaff())return;localExpanded.clear();mode='online';setRoomMenu(true);showMode();if(currentCode){setRoomMenu(false);return}const old=localStorage.getItem('kanuslalom-room-code');if(authReady&&old&&/^\d{6}$/.test(old))joinRoom(old)}
-function goHome(){localExpanded.clear();setRoomMenu(false);if(mode==='online'&&currentCode){if(unsubscribeRoom)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;syncQueue=[];syncBusy=false}mode='home';showMode()}
+function goHome(){clearRoomStatusListener();localExpanded.clear();setRoomMenu(false);if(mode==='online'&&currentCode){if(unsubscribeRoom)roomRef.off('value',unsubscribeRoom);unsubscribeRoom=null;roomRef=null;currentCode=null;syncQueue=[];syncBusy=false}mode='home';showMode()}
 document.getElementById('start-offline').onclick=enterOffline;
 document.getElementById('start-online').onclick=enterOnline;
 document.getElementById('back-home').onclick=()=>{goHome();showScreen('staff')};
 document.getElementById('archive-link').onclick=()=>{setRoomMenu(false);showScreen('archive')};
 document.getElementById('admin-link').onclick=()=>{setRoomMenu(false);showScreen('admin')};
+document.getElementById('rooms-admin-link').onclick=()=>{setRoomMenu(false);showScreen('rooms-admin')};
 // showMode wird nach Authentifizierung aufgerufen.
 
 let accountUser=null,accountAdmin=false,accountTrainer=false,accountPanel='login';
@@ -322,10 +335,11 @@ function renderAuth(){
 }
 function showScreen(name){
  document.body.classList.toggle('personal-view',name==='personal');
- for(const id of ['auth-screen','personal-screen','archive-screen','admin-screen'])document.getElementById(id).style.display='none';
+ for(const id of ['auth-screen','personal-screen','archive-screen','admin-screen','rooms-admin-screen'])document.getElementById(id).style.display='none';
  if(name==='auth'){document.getElementById('menu-open').style.visibility='hidden';document.getElementById('auth-screen').style.display='block';document.getElementById('mode-home').style.display='none';document.getElementById('app-main').style.display='none';renderAuth();return}
  if(name==='personal'){document.getElementById('menu-open').style.visibility='visible';document.getElementById('personal-screen').style.display='block';document.getElementById('mode-home').style.display='none';document.getElementById('app-main').style.display='none';showMyResults();return}
  if(name==='archive'){document.getElementById('menu-open').style.visibility='visible';document.getElementById('archive-screen').style.display='block';document.getElementById('mode-home').style.display='none';document.getElementById('app-main').style.display='none';loadArchives();return}
+ if(name==='rooms-admin'){if(!accountAdmin)return showScreen('staff');document.getElementById('menu-open').style.visibility='visible';document.getElementById('rooms-admin-screen').style.display='block';document.getElementById('mode-home').style.display='none';document.getElementById('app-main').style.display='none';refreshAdminRooms();return}
  if(name==='admin'){document.getElementById('menu-open').style.visibility='visible';document.getElementById('admin-screen').style.display='block';document.getElementById('mode-home').style.display='none';document.getElementById('app-main').style.display='none';showAthleteAdmin();return}
  showMode();
 }
@@ -392,10 +406,66 @@ async function onAuthState(user){
  authReady=!!user;renderAccount();roomUI();
  document.getElementById('staff-extra').style.display=isStaff()?'block':'none';
  document.getElementById('admin-link').style.display=accountAdmin?'block':'none';
+ document.getElementById('rooms-admin-link').style.display=accountAdmin?'block':'none';
  document.getElementById('menu-open').style.visibility=isStaff()?'visible':'hidden';
  if(isStaff()){loadAthleteAccounts();showScreen('staff');if(mode==='online'&&!currentCode){const old=localStorage.getItem('kanuslalom-room-code');if(old&&/^\d{6}$/.test(old))joinRoom(old)}}
- else {knownAthletes=[];if(user&&!user.isAnonymous)showScreen('personal');else showScreen('auth');}
+ else {knownAthletes=[];if(user&&!user.isAnonymous)showScreen('personal');else 
+
+
+showScreen('auth');}
 }
+// Phase 3.2 – Administratoransicht für gemeinsame Trainingseinheiten.
+let adminRooms=[],openAdminRoom=null;
+function roomAdminFeedback(message,error=false){const el=document.getElementById('admin-room-feedback');if(el){el.textContent=message;el.style.color=error?'#a42323':'#15803d';}}
+function roomAdminDate(value){const t=Number(value);return Number.isFinite(t)&&t>0?new Date(t).toLocaleString('de-DE'):'Unbekannt';}
+async function refreshAdminRooms(){
+ if(!accountAdmin)return;
+ const el=document.getElementById('admin-room-list');if(!el)return;
+ el.textContent='Trainingseinheiten werden geladen …';
+ try{const result=await adminCall('adminListRooms')({});adminRooms=Array.isArray(result.data?.rooms)?result.data.rooms:[];renderAdminRooms();}
+ catch(e){el.textContent='Trainingseinheiten konnten nicht geladen werden: '+(e.message||e);roomAdminFeedback('Laden fehlgeschlagen.',true);}
+}
+function renderAdminRooms(){
+ const el=document.getElementById('admin-room-list');if(!el)return;el.replaceChildren();
+ const rooms=[...adminRooms].sort((a,b)=>((a.status==='closed')-(b.status==='closed'))||(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
+ if(!rooms.length){el.textContent='Keine gemeinsamen Trainingseinheiten vorhanden.';return;}
+ for(const r of rooms){
+  const card=document.createElement('div');card.className='managed-room';
+  const trigger=document.createElement('button');trigger.type='button';trigger.className='room-admin-trigger';trigger.setAttribute('aria-expanded',String(openAdminRoom===r.code));
+  const identity=document.createElement('span');identity.className='room-admin-identity';
+  const title=document.createElement('strong');title.textContent=r.name||'Trainingseinheit';identity.appendChild(title);
+  const meta=document.createElement('small');meta.textContent='Raumcode: '+r.code+' · '+roomAdminDate(r.createdAt);identity.appendChild(meta);
+  const state=document.createElement('small');state.textContent=r.status==='closed'?'Geschlossen':'Offen';identity.appendChild(state);
+  trigger.appendChild(identity);const chevron=document.createElement('span');chevron.textContent=openAdminRoom===r.code?'⌃':'⌄';trigger.appendChild(chevron);card.appendChild(trigger);
+  const details=document.createElement('div');details.className='room-admin-details';details.hidden=openAdminRoom!==r.code;
+  const actions=document.createElement('div');actions.className='room-admin-actions';
+  const makeButton=(label,action)=>{const b=document.createElement('button');b.type='button';b.className='room-btn secondary';b.textContent=label;b.onclick=action;actions.appendChild(b);return b;};
+  makeButton('Archivieren',async()=>{
+   if(!confirm('Aktuellen Stand von Raum '+r.code+' im Ergebnisarchiv speichern? Persönliche Sportlerergebnisse werden dabei nicht veröffentlicht.'))return;
+   await runRoomAdminAction('adminArchiveRoom',{code:r.code},'Trainingseinheit archiviert.');
+  });
+  if(r.status!=='closed')makeButton('Schließen',async()=>{
+   if(!confirm('Trainingseinheit '+r.code+' wirklich schließen? Danach sind keine Änderungen oder Beitritte mehr möglich.'))return;
+   await runRoomAdminAction('adminCloseRoom',{code:r.code},'Trainingseinheit geschlossen.');
+  });
+  const del=makeButton('Löschen',async()=>{
+   const input=prompt('Zum endgültigen Löschen den Raumcode '+r.code+' eingeben. Archivierte Ergebnisse bleiben erhalten.');
+   if(input!==r.code){if(input!==null)roomAdminFeedback('Löschen abgebrochen: Raumcode stimmt nicht.',true);return;}
+   await runRoomAdminAction('adminDeleteRoom',{code:r.code,confirmation:input},'Trainingseinheit gelöscht.');
+  });del.style.background='#fff0f0';del.style.color='#a42323';
+  details.appendChild(actions);card.appendChild(details);
+  trigger.onclick=()=>{openAdminRoom=openAdminRoom===r.code?null:r.code;renderAdminRooms();};
+  el.appendChild(card);
+ }
+}
+async function runRoomAdminAction(name,payload,success){
+ const el=document.getElementById('admin-room-list');if(el)el.style.pointerEvents='none';
+ roomAdminFeedback('Aktion wird ausgeführt …');
+ try{const result=await adminCall(name)(payload);roomAdminFeedback(result.data?.alreadyArchived?'Diese Einheit ist bereits archiviert.':success);await refreshAdminRooms();}
+ catch(e){roomAdminFeedback('Aktion fehlgeschlagen: '+(e.message||e),true);}
+ finally{if(el)el.style.pointerEvents='';}
+}
+document.getElementById('refresh-admin-rooms').onclick=refreshAdminRooms;
 showScreen('auth');
 try{firebase.initializeApp(dbConfig);fbdb=firebase.database();firebase.auth().onAuthStateChanged(user=>{if(!user){onAuthState(null).catch(console.error);return}onAuthState(user).catch(console.error)});
 fbdb.ref('.info/serverTimeOffset').on('value',s=>{serverOffset=s.val()||0});fbdb.ref('.info/connected').on('value',s=>{connected=!!s.val();if(currentCode)statusMsg(connected?'Raum '+currentCode+' verbunden':'Offline – Änderungen vorübergehend gesperrt',!connected);else if(authReady)statusMsg(connected?'Bereit – Raum erstellen oder beitreten':'Offline',!connected)})}catch(e){statusMsg('Firebase konnte nicht geladen werden: '+e.message,true)}
